@@ -27,7 +27,7 @@ public class CustomDialogIcon extends Dialog {
 
 
     public enum Type {
-        BABY_FEED, MOTHER_FOOD, MOTHER_EMOTION, BABY_DIASPER, FATHER_COMMENT
+        BABY_FEED, MOTHER_FOOD, MOTHER_EMOTION, BABY_DIASPER, FATHER_COMMENT, FATHER_ASK
     }
 
 
@@ -63,7 +63,7 @@ public class CustomDialogIcon extends Dialog {
 
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.gravity = Gravity.CENTER | Gravity.BOTTOM;
-        params.y = size_y * 3;
+        params.y = size_y * 4;
 
         getWindow().setAttributes(params);
 
@@ -115,7 +115,6 @@ public class CustomDialogIcon extends Dialog {
                 imageView[2].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_rise_l, null));
                 imageView[3].setVisibility(ImageView.GONE);
                 imageView[4].setVisibility(ImageView.GONE);
-
                 break;
 
             case MOTHER_EMOTION:
@@ -137,6 +136,14 @@ public class CustomDialogIcon extends Dialog {
                 imageView[3].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_smile, null));
                 imageView[4].setVisibility(ImageView.GONE);
                 break;
+
+            case FATHER_ASK:
+                imageView[0].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_ask, null));
+                imageView[1].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_rise_sug, null));
+                imageView[2].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_rest_sug, null));
+                imageView[3].setVisibility(ImageView.GONE);
+                imageView[4].setVisibility(ImageView.GONE);
+                break;
         }
     }
 
@@ -144,7 +151,6 @@ public class CustomDialogIcon extends Dialog {
     {
         public void userSelectedAValue(Drawable draw);
     }
-
 
     public void setMyDialogListener(MyDialogListener a){
         listener = a;
@@ -156,7 +162,6 @@ public class CustomDialogIcon extends Dialog {
         this.type = type;
         size_x = sizex;
         size_y = sizey;
-
     }
 
     @Override
@@ -167,7 +172,6 @@ public class CustomDialogIcon extends Dialog {
         if (!dialogBounds.contains((int) ev.getX(), (int) ev.getY())) {
             this.dismiss();
         }
-
         return super.dispatchTouchEvent(ev);
     }
 }
