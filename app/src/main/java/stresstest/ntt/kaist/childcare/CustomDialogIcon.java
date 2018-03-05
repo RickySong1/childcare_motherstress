@@ -137,6 +137,7 @@ public class CustomDialogIcon extends Dialog {
                 imageView[4].setVisibility(ImageView.GONE);
                 break;
 
+
             case FATHER_ASK:
                 imageView[0].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_ask, null));
                 imageView[1].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_rise_sug, null));

@@ -45,6 +45,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,7 +54,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
+import stresstest.ntt.Garmin.MyOAuthConnect;
 import stresstest.ntt.smartband.SmartbandSettingActivity;
 
 public class MainActivity extends AppCompatActivity
@@ -78,6 +81,21 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*
+        try {
+            MyOAuthConnect a = new MyOAuthConnect();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
+
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
