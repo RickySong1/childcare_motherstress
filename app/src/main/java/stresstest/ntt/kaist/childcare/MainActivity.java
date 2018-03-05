@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     public static final int BABY = 0;
     public static final int MOTHER = 1;
     public static final int MOTHER_EMOTION = 2;
+    public static final int FATHER_COMMENT = 3;
     public static final int FATHER = 3;
 
     public static int USER = MOTHER;
@@ -179,8 +180,9 @@ public class MainActivity extends AppCompatActivity
         List <View> fatherIconList = new ArrayList();
 
         GraphView stressgraph;
-
         int nowHour;
+
+        float[] values;
 
         public PlaceholderFragment() {
         }
@@ -202,7 +204,7 @@ public class MainActivity extends AppCompatActivity
                                  Bundle savedInstanceState) {
             final View rootView = inflater.inflate(R.layout.content_main, container, false);
 
-            float[] values = new float[72];
+            values = new float[72];
             String[] verlabels = new String[] { "", "High", "Medium" , "Low" , ""};
 
             Random a = new Random();
@@ -310,6 +312,7 @@ public class MainActivity extends AppCompatActivity
 
             motherEmotionIconList.add(rootView.findViewById(R.id.activity_btn_m3));
 
+            fatherIconList.add(rootView.findViewById(R.id.activity_btn_m4));
             fatherIconList.add(rootView.findViewById(R.id.activity_btn_m5));
 
             motherViewList.get(nowHour).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
@@ -381,9 +384,13 @@ public class MainActivity extends AppCompatActivity
                     });
                 }
             }
-            for(int i=0 ; i < fatherIconList.size() ; i++){
-                fatherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_COMMENT));
+            for(int i=0 ; i < fatherIconList.size() ; i++) {
                 fatherIconList.get(i).setOnLongClickListener(new MyIconLongClickListener());
+                if (i == 0) {
+                    fatherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_COMMENT));
+                } else if (i == 1) {
+                    fatherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_ASK));
+                  }
             }
 
             //textView.setText( Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
@@ -420,19 +427,22 @@ public class MainActivity extends AppCompatActivity
 
             List <Boolean> motherEmotionBox = new ArrayList<>();
 
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(true);  // 3
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(true);  // 9
-            motherEmotionBox.add(false);
-            motherEmotionBox.add(false);
+            int count = 0;
+            boolean angry = false;
 
+            for(int i=0 ; i<values.length ; i++){
+                count ++;
+
+                if(values[i] >= GraphView.HIGH_STRESS_SCORE){
+                    angry = true;
+                }
+
+                if ( count % 6 == 0){
+                    motherEmotionBox.add(angry);
+                    angry = false;
+                }
+
+            }
             return motherEmotionBox;
         }
 
@@ -464,8 +474,18 @@ public class MainActivity extends AppCompatActivity
         private final class MyIconLongClickListener implements View.OnLongClickListener {
 
             public boolean onLongClick(View view) {
-                Drawable noShape = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_no, null);
 
+                if ( findIconGroup(view) != MOTHER_EMOTION && findIconGroup(view) != FATHER ) {
+                    for (int i = 0; i < motherEmotionList.size(); i++) {
+                        if (((ViewGroup) motherEmotionList.get(i)).getChildCount() <= 0) {
+
+                            Toast.makeText(getContext(), "엄마의 높은 스트레스 지수가 확인되었습니다. 적절한 감정을 먼저 기록해주세요.", Toast.LENGTH_SHORT).show();
+                            return true;
+                        }
+                    }
+                }
+
+                Drawable noShape = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_no, null);
                     ClipData data = ClipData.newPlainText("", "");
                     View.DragShadowBuilder shadowBuilder = new CanvasShadowCustom(view);
                     view.startDrag(data, shadowBuilder, view, 1);
@@ -520,9 +540,7 @@ public class MainActivity extends AppCompatActivity
                             Log.e("ERROR","Group Error happen");
                             break;
                     }
-
                     return true;
-
             }
         }
 
@@ -545,6 +563,9 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
                 mCustomDialog.show();
+
+                if( id == CustomDialogIcon.Type.FATHER_ASK)
+                    Toast.makeText(getContext(), "아이에 관해서 묻거나 엄마의 걱정을 표현하는 아이콘입니다. \n 1. 아이가 무엇을 했는지 묻기 \n 2. 엄마에게 식사 권장 \n 3. 엄마에게 쉬기 권장", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -636,11 +657,9 @@ public class MainActivity extends AppCompatActivity
         public void showIcon(View parent, Type a){
             switch(a){
                 case MOTHER_STRESS:  // Pass LinearLayout
-
                     LinearLayout parent_view = (LinearLayout) parent;
                     ImageView addImage = new ImageView(getContext());
                     addImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_warning, null)  );
-
                     AlphaAnimation blinkanimation= new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
                     blinkanimation.setDuration(800); // duration
                     blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
@@ -656,7 +675,6 @@ public class MainActivity extends AppCompatActivity
                     parent.setOnClickListener(new FatherAlertListener(Type.FATHER_BEFORE));
                     parent.clearAnimation();
                     break;
-
 
                 case FATHER_AFTER:
                     ((ImageView)parent).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sms, null));

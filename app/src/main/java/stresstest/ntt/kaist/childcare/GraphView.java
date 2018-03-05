@@ -15,6 +15,9 @@ import android.widget.TableRow;
  *
  */
 public class GraphView extends View {
+
+    public static final int HIGH_STRESS_SCORE = 90;
+
     public static boolean BAR = true;
     public static boolean LINE = false;
     private Paint paint;
@@ -22,6 +25,7 @@ public class GraphView extends View {
     private String[] horlabels;
     private String[] verlabels;
     private String title;
+
     private boolean type;
     public GraphView(Context context, float[] values, String title, String[] horlabels, String[] verlabels) {
         super(context);
@@ -92,8 +96,11 @@ public class GraphView extends View {
                     float rat = val / diff;
                     float h = graphheight * rat;
 
-                    //paint.setARGB(255 ,  (int) ((border - h) + graphheight) ,231, 244);
-                    paint.setARGB(255 ,  188 ,216, 255);
+
+                    if(values[i] >= HIGH_STRESS_SCORE)
+                        paint.setARGB(255 ,  255 ,  30 , 30);
+                    else
+                        paint.setARGB(255 ,  255 ,  200 , 200);
 
                     canvas.drawRect((i * colwidth) + horstart, (border - h) + graphheight, ((i * colwidth) + horstart) + (colwidth - 1), height - (border - 1), paint);
                 }
@@ -114,8 +121,6 @@ public class GraphView extends View {
             float y = ((graphheight / vers) * i) + border;
             canvas.drawLine(horstart, y, width, y, paint);
         }
-
-
     }
 
     private float getMax() {
