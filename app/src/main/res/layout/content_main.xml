@@ -30,15 +30,15 @@
             android:layout_marginLeft="10dp"
             />
 
-            <LinearLayout
-                android:id="@+id/graph_view"
-                android:orientation="vertical"
-                android:background="#e1e1e1"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/graph_view"
+            android:orientation="vertical"
+            android:background="#e1e1e1"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </LinearLayout>
 
 
         <TableRow
@@ -133,7 +133,7 @@
 
                 <TextView
                     android:layout_marginTop="3dp"
-                    android:text="Mother Emotion"
+                    android:text="엄마 감정"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:textColor="#666666"
@@ -256,285 +256,283 @@
 
 
                 <TextView
-                    android:text="Mother Activity"
+                    android:text="엄마 활동"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:textColor="#666666"
                     android:textSize="12dp" />
 
-                    <TableRow>
-                        <LinearLayout
-                            android:id="@+id/schedule_t1"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                        </LinearLayout>
+                <TableRow>
+                    <LinearLayout
+                        android:id="@+id/schedule_t1"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                    </LinearLayout>
 
 
-                         <LinearLayout
-                            android:id="@+id/schedule_t2"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                             android:gravity="center"
-                             android:background="@drawable/shape"
-                             android:orientation="vertical"
-                             >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t3"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                        </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t2"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t3"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                    </LinearLayout>
 
 
-                        <LinearLayout
-                            android:id="@+id/schedule_t4"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t5"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t6"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t7"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t8"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t9"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t10"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t11"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_t12"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical"
-                            >
-                            >
-                        </LinearLayout>
-                    </TableRow>
-
+                    <LinearLayout
+                        android:id="@+id/schedule_t4"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t5"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t6"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t7"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t8"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t9"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t10"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t11"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_t12"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical"
+                        >
+                        >
+                    </LinearLayout>
+                </TableRow>
 
                 <TextView
                     android:layout_marginTop="10dp"
-                    android:text="Father Comment"
+                    android:text="아빠 코멘트"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:textColor="#666666"
                     android:textSize="12dp"
                     />
+                <TableRow>
 
-                    <TableRow>
+                    <LinearLayout
+                        android:id="@+id/schedule_m1"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
 
-                        <LinearLayout
-                            android:id="@+id/schedule_m1"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m2"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m3"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m4"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m5"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m6"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m7"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m8"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m9"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m10"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m11"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                        <LinearLayout
-                            android:id="@+id/schedule_m12"
-                            android:layout_width="0dp"
-                            android:layout_height="30dp"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:background="@drawable/shape"
-                            android:orientation="vertical">
-                            >
-                        </LinearLayout>
-                    </TableRow>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m2"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m3"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m4"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m5"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m6"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m7"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m8"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m9"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m10"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m11"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/schedule_m12"
+                        android:layout_width="0dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:background="@drawable/shape"
+                        android:orientation="vertical">
+                        >
+                    </LinearLayout>
+                </TableRow>
 
                 <TextView
                     android:layout_marginTop="10dp"
-                    android:text="Baby Activity"
+                    android:text="아기 활동"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:textColor="#666666"
@@ -686,7 +684,7 @@
                 </TableRow>
 
                 <TableRow
-                    android:weightSum="5"
+                    android:weightSum="6"
                     android:layout_height="0dp"
                     android:layout_weight="3"
                     android:layout_width="match_parent"
@@ -701,6 +699,7 @@
                         <ImageView
                             android:padding="2dp"
                             android:id="@+id/activity_btn_t1"
+                            android:layout_weight="1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/ic_food_small"/>
@@ -721,12 +720,6 @@
                             android:typeface="sans" />
                     </RelativeLayout>
 
-                    <RelativeLayout
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" >
-
                         <ImageView
                             android:padding="2dp"
                             android:id="@+id/activity_btn_t2"
@@ -735,38 +728,33 @@
                             android:layout_weight="1"
                             android:src="@drawable/diaper_pee"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-
-                            android:layout_alignRight="@id/activity_btn_t2"
-                            android:layout_alignTop="@id/activity_btn_t2"
-                            android:gravity="top"
-
-                            android:text="↺"
-                            android:textColor="#ff0000"
-                            android:textSize="15dp"
-                            android:textStyle="bold"
-                            android:typeface="sans" />
-                    </RelativeLayout>
-
                     <ImageView
                         android:padding="2dp"
                         android:id="@+id/activity_btn_t3"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_sleeping_baby"/>
+                        android:src="@drawable/ic_baby_poop"/>
+
+
+
                     <ImageView
                         android:padding="2dp"
                         android:id="@+id/activity_btn_t4"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_bath"/>
+                        android:src="@drawable/ic_sleeping_baby"/>
                     <ImageView
                         android:padding="2dp"
                         android:id="@+id/activity_btn_t5"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_bath"/>
+                    <ImageView
+                        android:padding="2dp"
+                        android:id="@+id/activity_btn_t6"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -776,6 +764,7 @@
 
 
                 <TableRow
+                    android:weightSum="6"
                     android:layout_weight="1">
 
                     <TextView
@@ -783,67 +772,70 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Feed"/>
+                        android:text="식사"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Diasper"/>
+                        android:text="기저귀"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Sleep"/>
+                        android:text="대변"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Bath"/>
+                        android:text="잠자기"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Hold"/>
+                        android:text="목욕"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="아기보기"/>
                 </TableRow>
-
 
                 <LinearLayout
                     android:orientation="horizontal">
 
-                <TextView
-                    android:padding="2dp"
-                    android:background="@drawable/shape_mothertext"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Mother">
-                </TextView>
-
+                    <TextView
+                        android:padding="2dp"
+                        android:background="@drawable/shape_mothertext"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Mother">
+                    </TextView>
 
                     <TextView
                         android:padding="2dp"
-                    android:background="@drawable/shape_mothertext"
-                    android:layout_weight="2"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Father">
-                </TextView>
+                        android:background="@drawable/shape_mothertext"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Father">
+                    </TextView>
                 </LinearLayout>
 
                 <TableRow
-                    android:weightSum="5"
+                    android:weightSum="6"
                     android:layout_height="0dp"
                     android:layout_weight="3"
-                    android:layout_width="match_parent"
-                    >
+                    android:layout_width="match_parent">
 
                     <RelativeLayout
                         android:layout_gravity="center"
@@ -942,6 +934,13 @@
                             android:typeface="sans" />
                     </RelativeLayout>
 
+                    <ImageView
+                        android:padding="2dp"
+                        android:id="@+id/activity_btn_m5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_father_ask"/>
 
                     <RelativeLayout
                         android:layout_gravity="center"
@@ -951,18 +950,18 @@
 
                         <ImageView
                             android:padding="2dp"
-                            android:id="@+id/activity_btn_m5"
+                            android:id="@+id/activity_btn_m6"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:src="@drawable/ic_father_ask"/>
+                            android:src="@drawable/ic_father_rise_sug"/>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
-                            android:layout_alignRight="@id/activity_btn_m5"
-                            android:layout_alignTop="@id/activity_btn_m5"
+                            android:layout_alignRight="@id/activity_btn_m6"
+                            android:layout_alignTop="@id/activity_btn_m6"
                             android:gravity="top"
 
                             android:text="↺"
@@ -986,33 +985,40 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Meal"/>
+                        android:text="식사"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Rest"/>
+                        android:text="휴식"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Emotion"/>
+                        android:text="감정"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Feedback"/>
+                        android:text="코멘트"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Ask"/>
+                        android:text="묻기"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="제안"/>
 
                 </TableRow>
 

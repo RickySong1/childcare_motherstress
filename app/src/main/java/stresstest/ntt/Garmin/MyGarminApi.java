@@ -1,6 +1,8 @@
 package stresstest.ntt.Garmin;
 
 
+import android.util.Log;
+
 import com.github.scribejava.core.builder.api.DefaultApi10a;
 import com.github.scribejava.core.model.OAuth1RequestToken;
 
@@ -9,7 +11,7 @@ import com.github.scribejava.core.model.OAuth1RequestToken;
  */
 
 public class MyGarminApi extends DefaultApi10a {
-    private static final String AUTHORIZE_URL = "http://jimbo.com/oauth/authorize?token=%s";
+    private static final String AUTHORIZE_URL = "uuu";
 
     protected MyGarminApi() {
     }
@@ -28,8 +30,8 @@ public class MyGarminApi extends DefaultApi10a {
     }
 
     @Override
-    public String getAuthorizationUrl(OAuth1RequestToken oAuth1RequestToken) {
-        return null;
+    public String getAuthorizationUrl(OAuth1RequestToken requestToken) {
+        return String.format(AUTHORIZE_URL, requestToken.getToken());
     }
 
     @Override

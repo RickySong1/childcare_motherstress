@@ -65,8 +65,9 @@ public class MainActivity extends AppCompatActivity
     public static final int BABY = 0;
     public static final int MOTHER = 1;
     public static final int MOTHER_EMOTION = 2;
-    public static final int FATHER_COMMENT = 3;
-    public static final int FATHER = 3;
+    public static final int FATHER_COMMENT = 3;  // Feedback
+    public static final int FATHER_ASK = 4;  // Before time slot ,  ASK
+    public static final int FATHER_SUGGESTION = 5;  // After time slot  ,  SUGGESTION
 
     public static int USER = MOTHER;
 
@@ -77,23 +78,22 @@ public class MainActivity extends AppCompatActivity
         MOTHER_STRESS, FATHER_BEFORE, FATHER_AFTER
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*
+
         try {
             MyOAuthConnect a = new MyOAuthConnect();
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        */
 
 
         setContentView(R.layout.activity_main);
@@ -190,12 +190,16 @@ public class MainActivity extends AppCompatActivity
         List <View> babyViewList = new ArrayList();
         List <View> motherViewList = new ArrayList();
         List <View> motherEmotionList = new ArrayList();
-        List <View> fatherViewList = new ArrayList();
+        List <View> fatherViewListA = new ArrayList();
+        List <View> fatherViewListB = new ArrayList();
+        List <View> fatherViewListTemp = new ArrayList();
 
         List <View> babyIconList = new ArrayList();
         List <View> motherIconList = new ArrayList();
         List <View> motherEmotionIconList = new ArrayList();
-        List <View> fatherIconList = new ArrayList();
+        List <View> fatherIconListComment = new ArrayList();
+        List <View> fatherIconListAsk = new ArrayList();
+        List <View> fatherIconListSuggest = new ArrayList();
 
         GraphView stressgraph;
         int nowHour;
@@ -251,8 +255,8 @@ public class MainActivity extends AppCompatActivity
             graphView.addView(stressgraph);
 
             babyViewList.clear(); motherViewList.clear(); motherEmotionList.clear();
-            fatherViewList.clear(); babyIconList.clear(); motherIconList.clear();
-            motherEmotionIconList.clear(); fatherIconList.clear();
+            fatherViewListA.clear(); fatherViewListB.clear(); babyIconList.clear(); motherIconList.clear();
+            motherEmotionIconList.clear(); fatherIconListComment.clear(); fatherIconListAsk.clear(); fatherIconListSuggest.clear();
 
             List <View> motherEmotion_temp = new ArrayList();
             List<Boolean> stressfulBox = findStressfullBox();
@@ -293,18 +297,18 @@ public class MainActivity extends AppCompatActivity
             motherViewList.add(rootView.findViewById(R.id.schedule_t11));
             motherViewList.add(rootView.findViewById(R.id.schedule_t12));
 
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m1));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m2));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m3));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m4));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m5));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m6));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m7));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m8));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m9));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m10));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m11));
-            fatherViewList.add(rootView.findViewById(R.id.schedule_m12));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m1));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m2));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m3));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m4));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m5));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m6));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m7));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m8));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m9));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m10));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m11));
+            fatherViewListTemp.add(rootView.findViewById(R.id.schedule_m12));
 
             babyViewList.add(rootView.findViewById(R.id.schedule_b1));
             babyViewList.add(rootView.findViewById(R.id.schedule_b2));
@@ -324,17 +328,28 @@ public class MainActivity extends AppCompatActivity
             babyIconList.add(rootView.findViewById(R.id.activity_btn_t3));
             babyIconList.add(rootView.findViewById(R.id.activity_btn_t4));
             babyIconList.add(rootView.findViewById(R.id.activity_btn_t5));
+            babyIconList.add(rootView.findViewById(R.id.activity_btn_t6));
 
             motherIconList.add(rootView.findViewById(R.id.activity_btn_m1));
             motherIconList.add(rootView.findViewById(R.id.activity_btn_m2));
-
             motherEmotionIconList.add(rootView.findViewById(R.id.activity_btn_m3));
+            fatherIconListComment.add(rootView.findViewById(R.id.activity_btn_m4));
+            fatherIconListAsk.add(rootView.findViewById(R.id.activity_btn_m5));
+            fatherIconListSuggest.add(rootView.findViewById(R.id.activity_btn_m6));
 
-            fatherIconList.add(rootView.findViewById(R.id.activity_btn_m4));
-            fatherIconList.add(rootView.findViewById(R.id.activity_btn_m5));
+            for(int i=0 ; i< fatherViewListTemp.size() ; i++){
+                if( i < nowHour){ // Before time slot
+                    fatherViewListA.add(fatherViewListTemp.get(i));
+                    Log.e("AA",Integer.toString(i));
+                }
+                else{ // After time slot
+                    fatherViewListB.add(fatherViewListTemp.get(i));
+                    Log.e("BB",Integer.toString(i));
+                }
+            }
 
             motherViewList.get(nowHour).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
-            fatherViewList.get(nowHour).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
+            fatherViewListB.get(0).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
             babyViewList.get(nowHour).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
 
             for(int i=0 ; i< babyViewList.size() ; i++){
@@ -352,20 +367,25 @@ public class MainActivity extends AppCompatActivity
                 motherEmotionList.get(i).setOnClickListener(new MyTableClearListener());
                 //motherEmotionList.get(i).setLabelFor(i);  // already setup before
             }
-            for(int i=0 ; i< fatherViewList.size() ; i++){
-                fatherViewList.get(i).setOnDragListener(new MyDragListener(FATHER,i));
-                fatherViewList.get(i).setOnClickListener(new MyTableClearListener());
-                fatherViewList.get(i).setLabelFor(i);
+
+            for(int i=0 ; i< fatherViewListTemp.size() ; i++){
+                fatherViewListTemp.get(i).setLabelFor(i);
+            }
+
+            for(int i=0 ; i< fatherViewListA.size() ; i++){
+                fatherViewListA.get(i).setOnDragListener(new MyDragListener(FATHER_ASK,i));
+                fatherViewListA.get(i).setOnClickListener(new MyTableClearListener());
+            }
+            for(int i=0 ; i< fatherViewListB.size() ; i++){
+                fatherViewListB.get(i).setOnDragListener(new MyDragListener(FATHER_SUGGESTION,i));
+                fatherViewListB.get(i).setOnClickListener(new MyTableClearListener());
             }
 
             for(int i=0 ; i <  babyIconList.size() ; i++){
-                final  int tempi = i;
-                babyIconList.get(i).setOnLongClickListener(new MyIconLongClickListener());
+                babyIconList.get(i).setOnTouchListener(new MyIconTouchClickListener());
                 if(i==0)
                     babyIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.BABY_FEED));
-                else if(i==1){
-                    babyIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.BABY_DIASPER));
-                } else {
+                else {
                     babyIconList.get(i).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -374,9 +394,9 @@ public class MainActivity extends AppCompatActivity
                     });
                 }
             }
-            for(int i=0 ; i < motherIconList.size() ; i++){
-                motherIconList.get(i).setOnLongClickListener(new MyIconLongClickListener());
 
+            for(int i=0 ; i < motherIconList.size() ; i++){
+                motherIconList.get(i).setOnTouchListener(new MyIconTouchClickListener());
                 if(i==0)
                     motherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.MOTHER_FOOD));
                 else {
@@ -388,9 +408,9 @@ public class MainActivity extends AppCompatActivity
                     });
                 }
             }
-            for(int i=0 ; i < motherEmotionIconList.size() ; i++){
-                motherEmotionIconList.get(i).setOnLongClickListener(new MyIconLongClickListener());
 
+            for(int i=0 ; i < motherEmotionIconList.size() ; i++){
+                motherEmotionIconList.get(i).setOnTouchListener(new MyIconTouchClickListener());
                 if(i==0)
                     motherEmotionIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.MOTHER_EMOTION));
                 else {
@@ -402,17 +422,25 @@ public class MainActivity extends AppCompatActivity
                     });
                 }
             }
-            for(int i=0 ; i < fatherIconList.size() ; i++) {
-                fatherIconList.get(i).setOnLongClickListener(new MyIconLongClickListener());
-                if (i == 0) {
-                    fatherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_COMMENT));
-                } else if (i == 1) {
-                    fatherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_ASK));
-                  }
+            for(int i=0 ; i < fatherIconListComment.size() ; i++) {
+                fatherIconListComment.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                fatherIconListComment.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_COMMENT));
+            }
+            for(int i=0 ; i < fatherIconListAsk.size() ; i++) {
+                fatherIconListAsk.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                fatherIconListAsk.get(i).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            for(int i=0 ; i < fatherIconListSuggest.size() ; i++) {
+                fatherIconListSuggest.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                fatherIconListSuggest.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_SUGGESTION));
             }
 
             //textView.setText( Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-
             return rootView;
         }
 
@@ -433,35 +461,17 @@ public class MainActivity extends AppCompatActivity
                     return MOTHER_EMOTION;
                 }
             }
-            for(int i=0 ; i < fatherViewList.size() ; i++){
-                if( fatherViewList.get(i) == id){
-                    return FATHER;
+            for(int i=0 ; i < fatherViewListA.size() ; i++){
+                if( fatherViewListA.get(i) == id){
+                    return FATHER_ASK;
+                }
+            }
+            for(int i=0 ; i < fatherViewListB.size() ; i++){
+                if( fatherViewListB.get(i) == id){
+                    return FATHER_SUGGESTION;
                 }
             }
             return -1;
-        }
-
-        private List<Boolean> findStressfullBox(){
-
-            List <Boolean> motherEmotionBox = new ArrayList<>();
-
-            int count = 0;
-            boolean angry = false;
-
-            for(int i=0 ; i<values.length ; i++){
-                count ++;
-
-                if(values[i] >= GraphView.HIGH_STRESS_SCORE){
-                    angry = true;
-                }
-
-                if ( count % 6 == 0){
-                    motherEmotionBox.add(angry);
-                    angry = false;
-                }
-
-            }
-            return motherEmotionBox;
         }
 
         // To show only proper schedule box, otherwise to show X
@@ -481,84 +491,159 @@ public class MainActivity extends AppCompatActivity
                     return MOTHER_EMOTION;
                 }
             }
-            for(int i=0 ; i < fatherIconList.size() ; i++){
-                if( fatherIconList.get(i) == id){
-                    return FATHER;
+            for(int i=0 ; i < fatherIconListComment.size() ; i++){
+                if( fatherIconListComment.get(i) == id){
+                    return FATHER_COMMENT;
+                }
+            }
+            for(int i=0 ; i < fatherIconListAsk.size() ; i++){
+                if( fatherIconListAsk.get(i) == id){
+                    return FATHER_ASK;
+                }
+            }
+            for(int i=0 ; i < fatherIconListSuggest.size() ; i++){
+                if( fatherIconListSuggest.get(i) == id){
+                    return FATHER_SUGGESTION;
                 }
             }
             return -1;
         }
 
-        private final class MyIconLongClickListener implements View.OnLongClickListener {
-
-            public boolean onLongClick(View view) {
-
-                if ( findIconGroup(view) != MOTHER_EMOTION && findIconGroup(view) != FATHER ) {
-                    for (int i = 0; i < motherEmotionList.size(); i++) {
-                        if (((ViewGroup) motherEmotionList.get(i)).getChildCount() <= 0) {
-
-                            Toast.makeText(getContext(), "엄마의 높은 스트레스 지수가 확인되었습니다. 적절한 감정을 먼저 기록해주세요.", Toast.LENGTH_SHORT).show();
-                            return true;
-                        }
-                    }
+        private List<Boolean> findStressfullBox(){
+            List <Boolean> motherEmotionBox = new ArrayList<>();
+            int count = 0;
+            boolean angry = false;
+            for(int i=0 ; i<values.length ; i++){
+                count ++;
+                if(values[i] >= GraphView.HIGH_STRESS_SCORE){
+                    angry = true;
                 }
+                if ( count % 6 == 0){
+                    motherEmotionBox.add(angry);
+                    angry = false;
+                }
+            }
+            return motherEmotionBox;
+        }
 
-                Drawable noShape = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_no, null);
-                    ClipData data = ClipData.newPlainText("", "");
-                    View.DragShadowBuilder shadowBuilder = new CanvasShadowCustom(view);
-                    view.startDrag(data, shadowBuilder, view, 1);
-                    view.setVisibility(View.INVISIBLE);
+        private final class MyIconTouchClickListener implements View.OnTouchListener {
 
-                    switch(findIconGroup(view)){
-                        case BABY:
-                            for(int i=0 ; i< motherViewList.size() ; i++){
-                                motherViewList.get(i).setForeground(noShape);//.setBackground(noShape);
+            public boolean onTouch(View v, MotionEvent event) {
+                int NONE = 0;
+                int DRAG = 1;
+                int MAX_X_MOVE = 80;
+                int MAX_Y_MOVE = 80;
+                int m_mode = NONE;
+
+                final int action = event.getAction();
+
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        m_mode = NONE;
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+
+                        if (Math.abs(event.getX()) > MAX_X_MOVE || Math.abs(event.getY()) > MAX_Y_MOVE) {
+
+                            Log.e("xx", Float.toString(event.getX()));
+                            Log.e("yy", Float.toString(event.getY()));
+
+                            m_mode = DRAG;
+                            Drawable noShape = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_no, null);
+                            ClipData data = ClipData.newPlainText("", "");
+                            View.DragShadowBuilder shadowBuilder = new CanvasShadowCustom(v);
+                            Log.e("zz","111");
+                            v.startDrag(data, shadowBuilder, v, 0);
+                            Log.e("zz","222");
+                            v.setVisibility(View.INVISIBLE);
+
+                            switch (findIconGroup(v)) {
+                                case BABY:
+                                    for (int i = 0; i < motherViewList.size(); i++) {
+                                        motherViewList.get(i).setForeground(noShape);//.setBackground(noShape);
+                                    }
+                                    for (int i = 0; i < motherEmotionList.size(); i++) {
+                                        motherEmotionList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < fatherViewListTemp.size(); i++) {
+                                        fatherViewListTemp.get(i).setForeground(noShape);
+                                    }
+                                    break;
+                                case MOTHER:
+                                    for (int i = 0; i < babyViewList.size(); i++) {
+                                        babyViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < motherEmotionList.size(); i++) {
+                                        motherEmotionList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < fatherViewListTemp.size(); i++) {
+                                        fatherViewListTemp.get(i).setForeground(noShape);
+                                    }
+                                    break;
+                                case MOTHER_EMOTION:
+                                    for (int i = 0; i < babyViewList.size(); i++) {
+                                        babyViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < motherViewList.size(); i++) {
+                                        motherViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < fatherViewListTemp.size(); i++) {
+                                        fatherViewListTemp.get(i).setForeground(noShape);
+                                    }
+                                    break;
+                                case FATHER_COMMENT:
+                                    for (int i = 0; i < babyViewList.size(); i++) {
+                                        babyViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < motherViewList.size(); i++) {
+                                        motherViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < motherEmotionList.size(); i++) {
+                                        motherEmotionList.get(i).setForeground(noShape);
+                                    }
+                                    break;
+                                case FATHER_ASK:
+                                    for (int i = 0; i < babyViewList.size(); i++) {
+                                        babyViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < motherViewList.size(); i++) {
+                                        motherViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < motherEmotionList.size(); i++) {
+                                        motherEmotionList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < fatherViewListB.size(); i++) {
+                                        fatherViewListB.get(i).setForeground(noShape);
+                                    }
+                                    break;
+                                case FATHER_SUGGESTION:
+                                    for (int i = 0; i < babyViewList.size(); i++) {
+                                        babyViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < motherViewList.size(); i++) {
+                                        motherViewList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < motherEmotionList.size(); i++) {
+                                        motherEmotionList.get(i).setForeground(noShape);
+                                    }
+                                    for (int i = 0; i < fatherViewListA.size(); i++) {
+                                        fatherViewListA.get(i).setForeground(noShape);
+                                    }
+                                    break;
+                                default:
+                                    Log.e("ERROR", "Group Error happen");
+                                    break;
                             }
-                            for(int i=0 ; i< motherEmotionList.size() ; i++){
-                                motherEmotionList.get(i).setForeground(noShape);
-                            }
-                            for(int i=0 ; i< fatherViewList.size() ; i++){
-                                fatherViewList.get(i).setForeground(noShape);
-                            }
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (m_mode == DRAG) {
                             break;
-                        case MOTHER:
-                            for(int i=0 ; i< babyViewList.size() ; i++){
-                                babyViewList.get(i).setForeground(noShape);
-                            }
-                            for(int i=0 ; i< motherEmotionList.size() ; i++){
-                                motherEmotionList.get(i).setForeground(noShape);
-                            }
-                            for(int i=0 ; i< fatherViewList.size() ; i++){
-                                fatherViewList.get(i).setForeground(noShape);
-                            }
-                            break;
-                        case MOTHER_EMOTION:
-                            for(int i=0 ; i< babyViewList.size() ; i++){
-                                babyViewList.get(i).setForeground(noShape);
-                            }
-                            for(int i=0 ; i< motherViewList.size() ; i++){
-                                motherViewList.get(i).setForeground(noShape);
-                            }
-                            for(int i=0 ; i< fatherViewList.size() ; i++){
-                                fatherViewList.get(i).setForeground(noShape);
-                            }
-                            break;
-                        case FATHER:
-                            for(int i=0 ; i< babyViewList.size() ; i++){
-                                babyViewList.get(i).setForeground(noShape);
-                            }
-                            for(int i=0 ; i< motherViewList.size() ; i++){
-                                motherViewList.get(i).setForeground(noShape);
-                            }
-                            for(int i=0 ; i< motherEmotionList.size() ; i++){
-                                motherEmotionList.get(i).setForeground(noShape);
-                            }
-                            break;
-                        default:
-                            Log.e("ERROR","Group Error happen");
-                            break;
-                    }
-                    return true;
+                        }
+                        v.performClick();
+                        break;
+                }
+                return true;
             }
         }
 
@@ -582,8 +667,6 @@ public class MainActivity extends AppCompatActivity
                 });
                 mCustomDialog.show();
 
-                if( id == CustomDialogIcon.Type.FATHER_ASK)
-                    Toast.makeText(getContext(), "아이에 관해서 묻거나 엄마의 걱정을 표현하는 아이콘입니다. \n 1. 아이가 무엇을 했는지 묻기 \n 2. 엄마에게 식사 권장 \n 3. 엄마에게 쉬기 권장", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -726,20 +809,19 @@ public class MainActivity extends AppCompatActivity
             public boolean onDrag(View v, DragEvent event) {
 
                 boolean checkProper = false;
-
-                if(findScheduleBoxGroup(v) == findIconGroup((View)event.getLocalState())){
+                boolean drag_start = false;
+                if(findScheduleBoxGroup(v) == findIconGroup((View)event.getLocalState()) || (findScheduleBoxGroup(v) == FATHER_ASK && findIconGroup((View)event.getLocalState()) == FATHER_COMMENT) ||  (findScheduleBoxGroup(v) == FATHER_SUGGESTION && findIconGroup((View)event.getLocalState()) == FATHER_COMMENT) ){
                     checkProper = true;
                 }
 
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
-                        // do nothing
                         break;
                     case DragEvent.ACTION_DRAG_ENTERED:
                         if (checkProper)
                             v.setBackground(enterShape);
-
                         break;
+
                     case DragEvent.ACTION_DRAG_EXITED:
                         if (checkProper) {
                             if(nowHour == v.getLabelFor() && boxOwner != MOTHER_EMOTION )
@@ -779,10 +861,10 @@ public class MainActivity extends AppCompatActivity
 
                             if( newView.getDrawable().getAlpha() < 255){
                              // 253 - very bad , 254 - bad
-                                if(((ViewGroup)fatherViewList.get(v.getLabelFor())).getChildCount() > 0){
-                                    ((ViewGroup)fatherViewList.get(v.getLabelFor())).removeAllViews();
+                                if(((ViewGroup)fatherViewListTemp.get(v.getLabelFor())).getChildCount() > 0){
+                                    ((ViewGroup)fatherViewListTemp.get(v.getLabelFor())).removeAllViews();
                                 }
-                                showIcon(((ViewGroup)fatherViewList.get(v.getLabelFor())), Type.MOTHER_STRESS  );
+                                showIcon(((ViewGroup)fatherViewListTemp.get(v.getLabelFor())), Type.MOTHER_STRESS  );
                             }
                         }
                         break;

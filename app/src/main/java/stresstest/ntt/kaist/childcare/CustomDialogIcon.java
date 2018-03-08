@@ -27,7 +27,7 @@ public class CustomDialogIcon extends Dialog {
 
 
     public enum Type {
-        BABY_FEED, MOTHER_FOOD, MOTHER_EMOTION, BABY_DIASPER, FATHER_COMMENT, FATHER_ASK
+        BABY_FEED, MOTHER_FOOD, MOTHER_EMOTION, FATHER_COMMENT, FATHER_SUGGESTION
     }
 
 
@@ -101,13 +101,6 @@ public class CustomDialogIcon extends Dialog {
                 imageView[3].setVisibility(ImageView.GONE);
                 imageView[4].setVisibility(ImageView.GONE);
                 break;
-            case BABY_DIASPER:
-                imageView[0].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.diaper_pee, null));
-                imageView[1].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_baby_poop, null));
-                imageView[2].setVisibility(ImageView.GONE);
-                imageView[3].setVisibility(ImageView.GONE);
-                imageView[4].setVisibility(ImageView.GONE);
-                break;
 
             case MOTHER_FOOD:
                 imageView[0].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_rise_s, null));
@@ -120,7 +113,6 @@ public class CustomDialogIcon extends Dialog {
             case MOTHER_EMOTION:
                 imageView[0].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_emotion_lv1, null));
                 imageView[0].setImageAlpha(253);
-
                 imageView[1].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_emotion_lv2, null));
                 imageView[1].setImageAlpha(254);
 
@@ -137,11 +129,10 @@ public class CustomDialogIcon extends Dialog {
                 imageView[4].setVisibility(ImageView.GONE);
                 break;
 
-
-            case FATHER_ASK:
-                imageView[0].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_ask, null));
-                imageView[1].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_rise_sug, null));
-                imageView[2].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_rest_sug, null));
+            case FATHER_SUGGESTION:
+                imageView[0].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_rise_sug, null));
+                imageView[1].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_father_rest_sug, null));
+                imageView[2].setVisibility(ImageView.GONE);
                 imageView[3].setVisibility(ImageView.GONE);
                 imageView[4].setVisibility(ImageView.GONE);
                 break;
