@@ -27,7 +27,7 @@ public class CanvasShadowCustom extends View.DragShadowBuilder{
 
         //섀도우의 크기와 중심점의 좌표를 지정하는 메소드임
         shadowSize.set(mWidth, mHeight);//사이즈 지정
-        shadowTouchPoint.set(mWidth, mHeight+50);//중심점 지정
+        shadowTouchPoint.set(mWidth, mHeight+100);//중심점 지정
     }
 }
 

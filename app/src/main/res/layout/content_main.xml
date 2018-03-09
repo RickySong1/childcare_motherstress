@@ -14,6 +14,7 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:textStyle="bold"
             android:id="@+id/text_date"
             android:text="DATE"
             android:layout_height="wrap_content"
@@ -23,10 +24,11 @@
             />
 
         <TextView
-            android:text="Mother Stress"
+            android:textStyle="bold"
+            android:text="[엄마 스트레스 지수]"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:textColor="#1d1d1d"
+            android:textColor="#666666"
             android:layout_marginLeft="10dp"
             />
 
@@ -133,6 +135,7 @@
 
                 <TextView
                     android:layout_marginTop="3dp"
+                    android:textStyle="bold"
                     android:text="엄마 감정"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
@@ -143,7 +146,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t1"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -256,6 +259,7 @@
 
 
                 <TextView
+                    android:textStyle="bold"
                     android:text="엄마 활동"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
@@ -266,7 +270,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t1"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -398,6 +402,7 @@
                 </TableRow>
 
                 <TextView
+                    android:textStyle="bold"
                     android:layout_marginTop="10dp"
                     android:text="아빠 코멘트"
                     android:layout_height="wrap_content"
@@ -410,7 +415,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m1"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -531,6 +536,7 @@
                 </TableRow>
 
                 <TextView
+                    android:textStyle="bold"
                     android:layout_marginTop="10dp"
                     android:text="아기 활동"
                     android:layout_height="wrap_content"
@@ -661,6 +667,7 @@
             android:layout_weight="2">
 
             <TableLayout
+                android:id="@+id/icon_table"
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -670,16 +677,17 @@
                 >
 
                 <TableRow
-                    android:background="@drawable/shape_mothertext"
+                    android:background="@drawable/shape_babytitle"
                     android:layout_gravity="center"
                     android:gravity="center">
                     <TextView
                         android:padding="2dp"
                         android:gravity="center"
+                        android:textStyle="bold"
                         android:layout_gravity="center"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Baby">
+                        android:text="BABY">
                     </TextView>
                 </TableRow>
 
@@ -813,21 +821,23 @@
                         android:background="@drawable/shape_mothertext"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textStyle="bold"
                         android:layout_gravity="center"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Mother">
+                        android:text="MOTHER">
                     </TextView>
 
                     <TextView
                         android:padding="2dp"
-                        android:background="@drawable/shape_mothertext"
+                        android:background="@drawable/shape_fathertitle"
                         android:layout_weight="1"
+                        android:textStyle="bold"
                         android:gravity="center"
                         android:layout_gravity="center"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Father">
+                        android:text="FATHER">
                     </TextView>
                 </LinearLayout>
 

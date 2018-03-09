@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -41,6 +42,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,7 +62,7 @@ import stresstest.ntt.Garmin.MyOAuthConnect;
 import stresstest.ntt.smartband.SmartbandSettingActivity;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
     public static final int BABY = 0;
     public static final int MOTHER = 1;
@@ -73,6 +75,24 @@ public class MainActivity extends AppCompatActivity
 
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        int x = (int)event.getX();
+        int y = (int)event.getY();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.e("DOWN", Integer.toString(x) +" "+ Integer.toString(y));
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.e("MOVE", Integer.toString(x) +" "+ Integer.toString(y));
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.e("UP", Integer.toString(x) +" "+ Integer.toString(y));
+                break;
+        }
+        return false;
+    }
 
     public enum Type {
         MOTHER_STRESS, FATHER_BEFORE, FATHER_AFTER
@@ -206,6 +226,8 @@ public class MainActivity extends AppCompatActivity
 
         float[] values;
 
+        TableLayout icon_table;
+
         public PlaceholderFragment() {
         }
 
@@ -249,7 +271,7 @@ public class MainActivity extends AppCompatActivity
             else if (now.compareTo("11") == 0) nowHour = 10; else nowHour = 11;
 
             stressgraph = new GraphView(getContext() , values, "", null , verlabels);
-            stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 300 ));
+            stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 250 ));
 
             LinearLayout graphView = ((LinearLayout)rootView.findViewById(R.id.graph_view));
             graphView.addView(stressgraph);
@@ -258,6 +280,7 @@ public class MainActivity extends AppCompatActivity
             fatherViewListA.clear(); fatherViewListB.clear(); babyIconList.clear(); motherIconList.clear();
             motherEmotionIconList.clear(); fatherIconListComment.clear(); fatherIconListAsk.clear(); fatherIconListSuggest.clear();
 
+            icon_table = rootView.findViewById(R.id.icon_table);
             List <View> motherEmotion_temp = new ArrayList();
             List<Boolean> stressfulBox = findStressfullBox();
 
@@ -531,8 +554,7 @@ public class MainActivity extends AppCompatActivity
             public boolean onTouch(View v, MotionEvent event) {
                 int NONE = 0;
                 int DRAG = 1;
-                int MAX_X_MOVE = 80;
-                int MAX_Y_MOVE = 80;
+                int MAX_MOVE = 150;
                 int m_mode = NONE;
 
                 final int action = event.getAction();
@@ -543,19 +565,16 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case MotionEvent.ACTION_MOVE:
 
-                        if (Math.abs(event.getX()) > MAX_X_MOVE || Math.abs(event.getY()) > MAX_Y_MOVE) {
-
-                            Log.e("xx", Float.toString(event.getX()));
-                            Log.e("yy", Float.toString(event.getY()));
-
+                        if (Math.abs(event.getX()) + Math.abs(event.getY()) > MAX_MOVE ) {
                             m_mode = DRAG;
-                            Drawable noShape = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_no, null);
                             ClipData data = ClipData.newPlainText("", "");
                             View.DragShadowBuilder shadowBuilder = new CanvasShadowCustom(v);
-                            Log.e("zz","111");
                             v.startDrag(data, shadowBuilder, v, 0);
-                            Log.e("zz","222");
-                            v.setVisibility(View.INVISIBLE);
+
+                            Drawable noShape = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_no, null);
+                            Drawable Draging = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_draging, null);
+
+                            icon_table.setForeground(Draging);
 
                             switch (findIconGroup(v)) {
                                 case BABY:
@@ -634,6 +653,7 @@ public class MainActivity extends AppCompatActivity
                                     Log.e("ERROR", "Group Error happen");
                                     break;
                             }
+
                         }
                         break;
                     case MotionEvent.ACTION_UP:
@@ -787,9 +807,7 @@ public class MainActivity extends AppCompatActivity
                     parent.startAnimation(blinkanimation2);
                     parent.setOnClickListener(new FatherAlertListener(Type.FATHER_AFTER));
                     break;
-
             }
-
         }
 
         class MyDragListener implements View.OnDragListener {
@@ -816,10 +834,13 @@ public class MainActivity extends AppCompatActivity
 
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
+                        //v.setVisibility(View.INVISIBLE);
+
                         break;
                     case DragEvent.ACTION_DRAG_ENTERED:
-                        if (checkProper)
+                        if (checkProper) {
                             v.setBackground(enterShape);
+                        }
                         break;
 
                     case DragEvent.ACTION_DRAG_EXITED:
@@ -874,6 +895,9 @@ public class MainActivity extends AppCompatActivity
                             v.setBackground(normalNowShape);
                         else
                             v.setBackground(normalShape);
+
+                        if(icon_table.getForeground() != null)
+                            icon_table.setForeground(null);
 
                         v.setForeground(null);
                         View originalview = (View) event.getLocalState();
