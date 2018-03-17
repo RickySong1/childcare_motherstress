@@ -112,9 +112,9 @@ public class CustomDialogIcon extends Dialog {
 
             case MOTHER_EMOTION:
                 imageView[0].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_emotion_lv1, null));
-                imageView[0].setImageAlpha(253);
+                //imageView[0].setImageAlpha(253);
                 imageView[1].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_emotion_lv2, null));
-                imageView[1].setImageAlpha(254);
+                //imageView[1].setImageAlpha(254);
 
                 imageView[2].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_emotion_lv3, null));
                 imageView[3].setImageDrawable(ResourcesCompat.getDrawable( getContext().getResources(), R.drawable.ic_emotion_lv4, null));

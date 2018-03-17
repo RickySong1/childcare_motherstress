@@ -155,7 +155,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t2"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -164,7 +164,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t3"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -174,7 +174,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t4"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -184,7 +184,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t5"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -194,7 +194,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t6"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -203,7 +203,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t7"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -212,7 +212,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t8"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -221,7 +221,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t9"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -230,7 +230,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t10"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -239,7 +239,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t11"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -248,7 +248,7 @@
                     <LinearLayout
                         android:id="@+id/emotion_t12"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape_impossible"
@@ -282,7 +282,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t2"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -292,7 +292,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t3"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -304,7 +304,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t4"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -315,7 +315,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t5"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -325,7 +325,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t6"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -336,7 +336,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t7"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -347,7 +347,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t8"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -358,7 +358,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t9"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -369,7 +369,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t10"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -380,7 +380,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t11"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -391,7 +391,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_t12"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -426,7 +426,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m2"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -436,7 +436,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m3"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -446,7 +446,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m4"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -456,7 +456,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m5"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -466,7 +466,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m6"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -476,7 +476,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m7"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -486,7 +486,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m8"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -496,7 +496,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m9"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -506,7 +506,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m10"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -516,7 +516,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m11"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"
@@ -526,7 +526,7 @@
                     <LinearLayout
                         android:id="@+id/schedule_m12"
                         android:layout_width="0dp"
-                        android:layout_height="30dp"
+                        android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:background="@drawable/shape"

@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -30,8 +31,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="stresstest.ntt.smartband.SmartbandSettingActivity"
-            android:label="@string/title_activity_smartband_settings" />
+            android:name="stresstest.ntt.smartband.LoginSettingActivity"
+            android:label="@string/title_activity_smartband_settings"
+            />
 
     </application>
 

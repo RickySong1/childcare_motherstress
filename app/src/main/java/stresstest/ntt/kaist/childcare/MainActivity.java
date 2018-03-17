@@ -1,29 +1,27 @@
 package stresstest.ntt.kaist.childcare;
 
-import android.app.ActionBar;
+import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
-import android.text.Layout;
 import android.util.Log;
 import android.view.DragEvent;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -33,7 +31,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
@@ -41,28 +38,25 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
-import stresstest.ntt.Garmin.MyOAuthConnect;
-import stresstest.ntt.smartband.SmartbandSettingActivity;
+import stresstest.ntt.mymanager.MyFileManager;
+import stresstest.ntt.mymanager.MySocketManager;
+import stresstest.ntt.smartband.LoginSettingActivity;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
+import static stresstest.ntt.mymanager.MySocketManager.SOCKET_MSG.GET_BABYACTIVITY_UP;
+import static stresstest.ntt.mymanager.MySocketManager.SOCKET_MSG.SET_OPENAPP;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
     public static final int BABY = 0;
     public static final int MOTHER = 1;
@@ -70,11 +64,24 @@ public class MainActivity extends AppCompatActivity
     public static final int FATHER_COMMENT = 3;  // Feedback
     public static final int FATHER_ASK = 4;  // Before time slot ,  ASK
     public static final int FATHER_SUGGESTION = 5;  // After time slot  ,  SUGGESTION
+    public static int TOTAL_PAGE; // TOTAL_PAGE
+    public static Date NOW_TIME;
 
-    public static int USER = MOTHER;
+    public enum USER_TYPE_ENUM {
+        MOTHER, FATHER
+    }
+
+    public enum ICON_GROUP {
+        BABY_ACTIVITY, MOTHER_EMOTION, MOTHER_ACTIVITY, FATHER_COMMENT, FATHER_ASK ,FATHER_SUGGESTION
+    }
+
+    public static String USER_ID = "";
+    public static  USER_TYPE_ENUM USER_TYPE;
 
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
+
+    public static MySocketManager socketM;
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -102,33 +109,43 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        try {
-            MyOAuthConnect a = new MyOAuthConnect();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        //intent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
+        //MainActivity.this.startActivity(intent);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        MyFileManager mFile = new MyFileManager();
 
+        // If the user is already login
+        String userID = mFile.getUserIdFromFile();
+        if(mFile.getUserIdFromFile() != null){
+            MainActivity.USER_ID = userID;
+
+            if(userID.contains("MOTHER")){
+                MainActivity.USER_TYPE = USER_TYPE_ENUM.MOTHER;
+            }else if (userID.contains("FATHER")){
+                MainActivity.USER_TYPE = USER_TYPE_ENUM.FATHER;
+            }
+            ((TextView)navigationView.getHeaderView(0).findViewById(R.id.nav_userid)).setText(userID);
+        }else { // move login page
+            Intent intent=new Intent(MainActivity.this, LoginSettingActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+        NOW_TIME = new Date();
+        socketM = new MySocketManager(USER_ID);
+        SimpleDateFormat save_date = new SimpleDateFormat("yyyyMMdda");
+        socketM.setDataFromServer(SET_OPENAPP, save_date.format(NOW_TIME) , 0 , null);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -136,8 +153,36 @@ public class MainActivity extends AppCompatActivity
         View content_main = findViewById(R.id.app_bar_main);
 
         mViewPager = (ViewPager) content_main.findViewById(R.id.content_viewpager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(2);
+
+        UpdateViewPager updateViewPager = new UpdateViewPager (mViewPager, mSectionsPagerAdapter);
+        updateViewPager.execute((Void) null);
+
+        //mViewPager.setAdapter(mSectionsPagerAdapter);
+        //mViewPager.setCurrentItem(TOTAL_PAGE);
+    }
+
+    public class UpdateViewPager extends AsyncTask<Void, Void, Boolean> {
+
+        ViewPager mViewPager;
+        SectionsPagerAdapter mSectionsPagerAdapter;
+
+        UpdateViewPager(ViewPager _a, SectionsPagerAdapter _b) {
+            mViewPager = _a;
+            mSectionsPagerAdapter = _b;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            socketM = new MySocketManager(USER_ID);
+            TOTAL_PAGE = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_PAGE_COUNT , null));
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            mViewPager.setCurrentItem(TOTAL_PAGE);
+        }
     }
 
 
@@ -184,18 +229,17 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_login){
-            Log.e("Login", "dd");
-        }else if( id == R.id.nav_smartband){
-
-            Intent intent=new Intent(MainActivity.this, SmartbandSettingActivity.class);
+            Intent intent=new Intent(MainActivity.this, LoginSettingActivity.class);
             startActivity(intent);
+        }else if( id == R.id.nav_smartband){
+            Intent intent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
+            MainActivity.this.startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
     /**
      * A placeholder fragment containing a simple view.
@@ -210,6 +254,7 @@ public class MainActivity extends AppCompatActivity
         List <View> babyViewList = new ArrayList();
         List <View> motherViewList = new ArrayList();
         List <View> motherEmotionList = new ArrayList();
+        List <View> motherEmotionListTemp = new ArrayList();
         List <View> fatherViewListA = new ArrayList();
         List <View> fatherViewListB = new ArrayList();
         List <View> fatherViewListTemp = new ArrayList();
@@ -221,12 +266,21 @@ public class MainActivity extends AppCompatActivity
         List <View> fatherIconListAsk = new ArrayList();
         List <View> fatherIconListSuggest = new ArrayList();
 
+        String motherEmotionString = "0 0 0 0 0 E1 0 0 0 E2 E4 E5";
+        String motherActivityString = "M1 0 M2 0 0 0 M3 0 0 RE 0 0";
+        String fatherCommentString = "C1 0 0 AS 0 C2 0 S1 0 C3 0 0";
+        String babyActivityUpString = "B1 DI B2 0 0 SL B3 B3 B3 0 B1 0";
+        String babyActivityDownString = "B1 SL B3 0 SL 0 0 0 HO B2 B2 0";
+
         GraphView stressgraph;
         int nowHour;
 
         float[] values;
 
         TableLayout icon_table;
+
+        Date THIS_TIME;
+        SimpleDateFormat save_date;
 
         public PlaceholderFragment() {
         }
@@ -244,31 +298,35 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
             final View rootView = inflater.inflate(R.layout.content_main, container, false);
-
-            values = new float[72];
+            int page_num = getArguments().getInt(ARG_SECTION_NUMBER);
+            values = new float[240];
             String[] verlabels = new String[] { "", "High", "Medium" , "Low" , ""};
 
             Random a = new Random();
-            for(int i=0 ; i<72 ;i++){
+            for(int i=0 ; i<240 ;i++){
                 values[ i] = a.nextInt(100);
             }
 
-            Date today = new Date();
+            THIS_TIME = new Date();
+            THIS_TIME.setTime(NOW_TIME.getTime() - ( (12 * 60 * 60 * 1000)* (TOTAL_PAGE - page_num) ));
+
 
             SimpleDateFormat date = new SimpleDateFormat("EEE, dd MMMM (a)");
             SimpleDateFormat time = new SimpleDateFormat("hh");
-            ((TextView)rootView.findViewById(R.id.text_date)).setText(date.format(today));
+            save_date = new SimpleDateFormat("yyyyMMdda");
 
-            String now = time.format(today);
+
+            ((TextView)rootView.findViewById(R.id.text_date)).setText(date.format(THIS_TIME));
+
+            String now = time.format(THIS_TIME);
             if(now.compareTo("01") == 0) nowHour =0; else if(now.compareTo("02") == 0) nowHour = 1;
             else if (now.compareTo("03") == 0) nowHour = 2; else if (now.compareTo("04") == 0) nowHour = 3;
             else if (now.compareTo("05") == 0) nowHour = 4; else if (now.compareTo("06") == 0) nowHour = 5;
             else if (now.compareTo("07") == 0) nowHour = 6; else if (now.compareTo("08") == 0) nowHour = 7;
             else if (now.compareTo("09") == 0) nowHour = 8; else if (now.compareTo("10") == 0) nowHour = 9;
-            else if (now.compareTo("11") == 0) nowHour = 10; else nowHour = 11;
+            else if (now.compareTo("11") == 0) nowHour = 10; else if(now.compareTo("11") == 0) nowHour = 11;
 
             stressgraph = new GraphView(getContext() , values, "", null , verlabels);
             stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 250 ));
@@ -276,35 +334,34 @@ public class MainActivity extends AppCompatActivity
             LinearLayout graphView = ((LinearLayout)rootView.findViewById(R.id.graph_view));
             graphView.addView(stressgraph);
 
-            babyViewList.clear(); motherViewList.clear(); motherEmotionList.clear();
+            babyViewList.clear(); motherViewList.clear(); motherEmotionList.clear(); ; motherEmotionListTemp.clear();
             fatherViewListA.clear(); fatherViewListB.clear(); babyIconList.clear(); motherIconList.clear();
             motherEmotionIconList.clear(); fatherIconListComment.clear(); fatherIconListAsk.clear(); fatherIconListSuggest.clear();
 
             icon_table = rootView.findViewById(R.id.icon_table);
-            List <View> motherEmotion_temp = new ArrayList();
             List<Boolean> stressfulBox = findStressfullBox();
 
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t1));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t2));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t3));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t4));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t5));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t6));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t7));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t8));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t9));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t10));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t11));
-            motherEmotion_temp.add(rootView.findViewById(R.id.emotion_t12));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t1));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t2));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t3));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t4));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t5));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t6));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t7));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t8));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t9));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t10));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t11));
+            motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t12));
 
             for(int i=0 ; i<stressfulBox.size() ; i++){
                 if(stressfulBox.get(i) == true){
-                    motherEmotion_temp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape, null));
-                    motherEmotionList.add(motherEmotion_temp.get(i));
+                    motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape, null));
+                    motherEmotionList.add(motherEmotionListTemp.get(i));
                     motherEmotionList.get(motherEmotionList.size()-1).setLabelFor(i); // just added value
                 }
                 else
-                    motherEmotion_temp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_impossible, null));
+                    motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_impossible, null));
             }
 
             motherViewList.add(rootView.findViewById(R.id.schedule_t1));
@@ -363,17 +420,18 @@ public class MainActivity extends AppCompatActivity
             for(int i=0 ; i< fatherViewListTemp.size() ; i++){
                 if( i < nowHour){ // Before time slot
                     fatherViewListA.add(fatherViewListTemp.get(i));
-                    Log.e("AA",Integer.toString(i));
                 }
                 else{ // After time slot
                     fatherViewListB.add(fatherViewListTemp.get(i));
-                    Log.e("BB",Integer.toString(i));
                 }
             }
 
-            motherViewList.get(nowHour).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
-            fatherViewListB.get(0).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
-            babyViewList.get(nowHour).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
+            // ONLY RIGHT_NOW PAGE shows this time
+            if(page_num == TOTAL_PAGE) {
+                motherViewList.get(nowHour).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
+                fatherViewListB.get(0).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
+                babyViewList.get(nowHour).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_nowtime, null));
+            }
 
             for(int i=0 ; i< babyViewList.size() ; i++){
                 babyViewList.get(i).setOnDragListener(new MyDragListener(BABY,i));
@@ -405,7 +463,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             for(int i=0 ; i <  babyIconList.size() ; i++){
-                babyIconList.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                babyIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.BABY_ACTIVITY , i));
                 if(i==0)
                     babyIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.BABY_FEED));
                 else {
@@ -419,7 +477,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             for(int i=0 ; i < motherIconList.size() ; i++){
-                motherIconList.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                motherIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.MOTHER_ACTIVITY,i));
                 if(i==0)
                     motherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.MOTHER_FOOD));
                 else {
@@ -433,7 +491,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             for(int i=0 ; i < motherEmotionIconList.size() ; i++){
-                motherEmotionIconList.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                motherEmotionIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.MOTHER_EMOTION,i));
                 if(i==0)
                     motherEmotionIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.MOTHER_EMOTION));
                 else {
@@ -446,11 +504,11 @@ public class MainActivity extends AppCompatActivity
                 }
             }
             for(int i=0 ; i < fatherIconListComment.size() ; i++) {
-                fatherIconListComment.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                fatherIconListComment.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_COMMENT,i));
                 fatherIconListComment.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_COMMENT));
             }
             for(int i=0 ; i < fatherIconListAsk.size() ; i++) {
-                fatherIconListAsk.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                fatherIconListAsk.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_ASK,i));
                 fatherIconListAsk.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -459,9 +517,26 @@ public class MainActivity extends AppCompatActivity
                 });
             }
             for(int i=0 ; i < fatherIconListSuggest.size() ; i++) {
-                fatherIconListSuggest.get(i).setOnTouchListener(new MyIconTouchClickListener());
+                fatherIconListSuggest.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_SUGGESTION,i));
                 fatherIconListSuggest.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_SUGGESTION));
             }
+
+
+            UpdateInterface mMotherActTask = new UpdateInterface(motherViewList, MySocketManager.SOCKET_MSG.GET_MOTHERACTIVITY , null, save_date.format(THIS_TIME));
+            mMotherActTask.execute((Void) null);
+
+            UpdateInterface mMotherEmotionTask = new UpdateInterface(motherEmotionListTemp, MySocketManager.SOCKET_MSG.GET_MOTHEREMOTION , null, save_date.format(THIS_TIME));
+            mMotherEmotionTask.execute((Void) null);
+
+            UpdateInterface mFatherCommentTask = new UpdateInterface(fatherViewListTemp, MySocketManager.SOCKET_MSG.GET_FATHERCOMMENT, null, save_date.format(THIS_TIME));
+            mFatherCommentTask.execute((Void) null);
+
+            UpdateInterface mBabyActTask = new UpdateInterface(babyViewList, MySocketManager.SOCKET_MSG.GET_BABYACTIVITY_UP, null , save_date.format(THIS_TIME));
+            mBabyActTask.execute((Void) null);
+
+            mBabyActTask = new UpdateInterface(babyViewList, MySocketManager.SOCKET_MSG.GET_BABYACTIVITY_DOWN, null , save_date.format(THIS_TIME));
+            mBabyActTask.execute((Void) null);
+
 
             //textView.setText( Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
@@ -541,7 +616,7 @@ public class MainActivity extends AppCompatActivity
                 if(values[i] >= GraphView.HIGH_STRESS_SCORE){
                     angry = true;
                 }
-                if ( count % 6 == 0){
+                if ( count % 20 == 0){
                     motherEmotionBox.add(angry);
                     angry = false;
                 }
@@ -550,6 +625,14 @@ public class MainActivity extends AppCompatActivity
         }
 
         private final class MyIconTouchClickListener implements View.OnTouchListener {
+
+            ICON_GROUP boxOwner;
+            int id;
+
+            MyIconTouchClickListener(ICON_GROUP _boxO , int _id){
+
+
+            }
 
             public boolean onTouch(View v, MotionEvent event) {
                 int NONE = 0;
@@ -564,13 +647,11 @@ public class MainActivity extends AppCompatActivity
                         m_mode = NONE;
                         break;
                     case MotionEvent.ACTION_MOVE:
-
                         if (Math.abs(event.getX()) + Math.abs(event.getY()) > MAX_MOVE ) {
                             m_mode = DRAG;
                             ClipData data = ClipData.newPlainText("", "");
                             View.DragShadowBuilder shadowBuilder = new CanvasShadowCustom(v);
                             v.startDrag(data, shadowBuilder, v, 0);
-
                             Drawable noShape = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_no, null);
                             Drawable Draging = ResourcesCompat.getDrawable(getResources(), R.drawable.shape_draging, null);
 
@@ -653,7 +734,6 @@ public class MainActivity extends AppCompatActivity
                                     Log.e("ERROR", "Group Error happen");
                                     break;
                             }
-
                         }
                         break;
                     case MotionEvent.ACTION_UP:
@@ -835,7 +915,6 @@ public class MainActivity extends AppCompatActivity
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
                         //v.setVisibility(View.INVISIBLE);
-
                         break;
                     case DragEvent.ACTION_DRAG_ENTERED:
                         if (checkProper) {
@@ -880,13 +959,41 @@ public class MainActivity extends AppCompatActivity
                             newView.setImageDrawable(oldView.getDrawable());
                             container.addView(newView);                       // Changed to add new view instead
 
-                            if( newView.getDrawable().getAlpha() < 255){
-                             // 253 - very bad , 254 - bad
+                            // if( newView.getDrawable().getAlpha() < 255){
+                            // 253 - very bad , 254 - bad
+
+                            // Mother emotion view list's index is different
+                            if( getDrawableString( getResources()  ,newView.getDrawable()).compareTo("E1") == 0 || getDrawableString( getResources()  ,newView.getDrawable()).compareTo("E2") == 0 ){
                                 if(((ViewGroup)fatherViewListTemp.get(v.getLabelFor())).getChildCount() > 0){
                                     ((ViewGroup)fatherViewListTemp.get(v.getLabelFor())).removeAllViews();
                                 }
                                 showIcon(((ViewGroup)fatherViewListTemp.get(v.getLabelFor())), Type.MOTHER_STRESS  );
                             }
+
+                            String save_icon_string = getDrawableString( getResources()  ,newView.getDrawable());
+
+                            switch(boxOwner){
+                                case BABY:
+                                    socketM = new MySocketManager(USER_ID);
+                                    //socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET);
+                                    break;
+                                case MOTHER:
+                                    socketM = new MySocketManager(USER_ID);
+                                    socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHERACTIVITY, save_date.format(THIS_TIME) , id , save_icon_string) ;
+                                    break;
+                                case MOTHER_EMOTION:
+                                    socketM = new MySocketManager(USER_ID);
+                                    socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHEREMOTION, save_date.format(THIS_TIME) , v.getLabelFor() , save_icon_string) ;  // Mother emoticon index is different
+                                    break;
+                                case FATHER_COMMENT:
+                                case FATHER_ASK:
+                                case FATHER_SUGGESTION:
+                                    socketM = new MySocketManager(USER_ID);
+                                    socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT, save_date.format(THIS_TIME) , v.getLabelFor() , save_icon_string) ;
+                                    break;
+                            }
+
+
                         }
                         break;
 
@@ -910,7 +1017,197 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         }
+
+        public static String getDrawableString(Resources a , Drawable b) {
+            if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_food_small, null), b)) {
+                return "B1";
+            } else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_food_medium, null), b)){
+                return "B2";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_food_large, null), b)){
+                return "B3";
+            } else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.diaper_pee, null), b)){
+                return "DI";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_baby_poop, null), b)){
+                return "DU";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_sleeping_baby, null), b)){
+                return "SL";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_bath, null), b)){
+                return "B1";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_motherhood, null), b)){
+                return "H0";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_rise_s, null), b)){
+                return "M1";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_rise_m, null), b)){
+                return "M2";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_rise_l, null), b)){
+                return "M3";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_rest, null), b)){
+                return "RE";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_emotion_lv1, null), b)){
+                return "E1";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_emotion_lv2, null), b)){
+                return "E2";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_emotion_lv3, null), b)){
+                return "E3";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_emotion_lv4, null), b)){
+                return "E4";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_emotion_lv5, null), b)){
+                return "E5";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_heart, null), b)){
+                return "C1";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_rose, null), b)){
+                return "C2";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_thumsup, null), b)){
+                return "C3";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_smile, null), b)){
+                return "C4";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_ask, null), b)){
+                return "AS";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_rise_sug, null), b)){
+                return "S1";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_rest_sug, null), b)){
+                return "S2";
+            }
+            return "NULL";
+        }
+
+
+        public static boolean areDrawablesIdentical(Drawable drawableA, Drawable drawableB) {
+            Drawable.ConstantState stateA = drawableA.getConstantState();
+            Drawable.ConstantState stateB = drawableB.getConstantState();
+            // If the constant state is identical, they are using the same drawable resource.
+            // However, the opposite is not necessarily true.
+            return (stateA != null && stateB != null && stateA.equals(stateB)) || getBitmap(drawableA).sameAs(getBitmap(drawableB));
+        }
+
+        public static Bitmap getBitmap(Drawable drawable) {
+            Bitmap result;
+            if (drawable instanceof BitmapDrawable) {
+                result = ((BitmapDrawable) drawable).getBitmap();
+            } else {
+                int width = drawable.getIntrinsicWidth();
+                int height = drawable.getIntrinsicHeight();
+                // Some drawables have no intrinsic width - e.g. solid colours.
+                if (width <= 0) {
+                    width = 1;
+                }
+                if (height <= 0) {
+                    height = 1;
+                }
+                result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                Canvas canvas = new Canvas(result);
+                drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+                drawable.draw(canvas);
+            }
+            return result;
+        }
+
+        public class UpdateInterface extends AsyncTask<Void, Void, Boolean> {
+
+            private List <View> viewList;
+            private String data;
+            private String date;
+            private MySocketManager.SOCKET_MSG msg;
+            // Update Interface
+            //
+            // B1 DI DU SL BA HO
+            // M1 RE E1 C1 AS S1
+
+            UpdateInterface(List <View> _viewList, MySocketManager.SOCKET_MSG _msg,  String _data, String _date) {
+                viewList = _viewList;
+                data = _data;
+                date = _date;
+                msg = _msg;
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                // TODO: attempt authentication against a network service.
+
+                if(data == null) {
+                    socketM = new MySocketManager(USER_ID);
+                    data = socketM.getDataFromServer(msg, date);
+                }
+
+                // TODO: register the new account here.
+                return false;
+            }
+
+
+            @Override
+            protected void onPostExecute(final Boolean success) {
+                // B1 DI DU SL BA HO
+                // M1 RE E1 C1 AS S1
+
+                if(data==null){
+                    Log.e("onPostExecute", msg.toString());
+                    Log.e("onPostExecute", data);
+                }
+
+                String[] pieces = data.split(" ");
+
+                for(int i=0 ; i < pieces.length ; i++){
+                    Drawable icon=null;
+                    if( pieces[i].equals("B1")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_small, null);
+                    } else if ( pieces[i].equals("B2")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_medium, null);
+                    }else if ( pieces[i].equals("B3")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_large, null);
+                    }else if ( pieces[i].equals("DI")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.diaper_pee, null);
+                    }else if ( pieces[i].equals("DU")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baby_poop, null);
+                    }else if ( pieces[i].equals("SL")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sleeping_baby, null);
+                    }else if ( pieces[i].equals("BA")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bath, null);
+                    }else if ( pieces[i].equals("HO")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_motherhood, null);
+                    }else if ( pieces[i].equals("M1")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_s, null);
+                    }else if ( pieces[i].equals("M2")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_m, null);
+                    }else if ( pieces[i].equals("M3")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_l, null);
+                    }else if ( pieces[i].equals("RE")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rest, null);
+                    }else if ( pieces[i].equals("E1")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv1, null);
+                    }else if ( pieces[i].equals("E2")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv2, null);
+                    }else if ( pieces[i].equals("E3")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv3, null);
+                    }else if ( pieces[i].equals("E4")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv4, null);
+                    }else if ( pieces[i].equals("E5")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv5, null);
+                    }else if ( pieces[i].equals("C1")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_heart, null);
+                    }else if ( pieces[i].equals("C2")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rose, null);
+                    }else if ( pieces[i].equals("C3")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_thumsup, null);
+                    }else if ( pieces[i].equals("C4")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_smile, null);
+                    }else if ( pieces[i].equals("AS")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_ask, null);
+                    }else if ( pieces[i].equals("S1")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rise_sug, null);
+                    }else if ( pieces[i].equals("S2")){
+                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rest_sug, null);
+                    }
+
+                    if(icon !=null) {
+                        ImageView addImage = new ImageView(getContext());
+                        addImage.setImageDrawable(icon);
+                        ((LinearLayout)viewList.get(i)).addView(addImage);
+                    }
+                }
+            }
+        }
     }
+
 
 
 
@@ -933,8 +1230,7 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            return TOTAL_PAGE;
         }
     }
 }
