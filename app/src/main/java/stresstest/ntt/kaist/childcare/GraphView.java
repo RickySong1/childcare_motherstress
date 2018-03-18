@@ -16,21 +16,21 @@ import android.widget.TableRow;
  */
 public class GraphView extends View {
 
-    public static final int HIGH_STRESS_SCORE = 90;
+    public static final int HIGH_STRESS_SCORE = 50;
 
     public static boolean BAR = true;
     public static boolean LINE = false;
     private Paint paint;
-    private float[] values;
+    private int [] values;
     private String[] horlabels;
     private String[] verlabels;
     private String title;
 
     private boolean type;
-    public GraphView(Context context, float[] values, String title, String[] horlabels, String[] verlabels) {
+    public GraphView(Context context, int [] values, String title, String[] horlabels, String[] verlabels) {
         super(context);
         if (values == null)
-            values = new float[0];
+            values = new int[0];
         else
             this.values = values;
         if (title == null)

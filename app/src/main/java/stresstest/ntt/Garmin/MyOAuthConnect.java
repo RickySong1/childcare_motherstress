@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpResponse;
@@ -28,11 +29,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 
 public class MyOAuthConnect {
 
     private static final String PROTECTED_RESOURCE_URL = "https://healthapi.garmin.com/wellness-api/rest/stressDetails?uploadStartTimeInSeconds=1520348400&uploadEndTimeInSeconds=1520402702";
-
 
     final String Consumer_Key ="fef35759-89eb-4915-acf4-4a991c0414d6";
     final String Consumer_Secret = "BzhUGDBRCmo8IpDMxzPB80AgSDteJFOnSkw";
@@ -40,24 +43,22 @@ public class MyOAuthConnect {
     final String User_Token = "500c5606-46cc-4ffb-a436-1ad508d42cf0";
     final String User_Secret = "Vi9YHR99yUVvxdqe03CDIayVo3S4axhDIJV";
 
-    public MyOAuthConnect() throws Exception {
+    public MyOAuthConnect( ) throws Exception {
         new Thread(new Runnable() {
             @Override public void run()
             {
                 try {
                     sendGet();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e("MyOAuthConnect",e.toString());
                 }
             }
         }).start();
     }
 
-    private void sendGet() throws Exception {
-
+    public int[] sendGet() throws Exception {
 
         final OAuth10aService service = new ServiceBuilder(Consumer_Key).apiSecret(Consumer_Secret).debug().build(MyGarminApi.instance());
-
         //final OAuth10aService service = new ServiceBuilder(Consumer_Key).apiKey(Consumer_Key).apiSecret(Consumer_Secret).debug().build(TwitterApi.instance());
         //final OAuth1RequestToken requestToken = service.getRequestToken();
         //Log.e("step 1",service.getAuthorizationUrl(requestToken));
@@ -67,8 +68,6 @@ public class MyOAuthConnect {
         final OAuthRequest request = new OAuthRequest(Verb.GET, PROTECTED_RESOURCE_URL );
 
         service.signRequest(accessToken, request);
-
-
         final Response response = service.execute(request);
 
         BufferedReader in = new BufferedReader(new InputStreamReader(response.getStream()));
@@ -80,10 +79,34 @@ public class MyOAuthConnect {
             responseJson.append(inputLine);
         }
 
-        Log.e("step 3-1", responseJson.toString());
-        Log.e("step 3", response.getMessage());
-        Log.e("step 3", response.toString());
-        Log.e("step 3", Boolean.toString(response.isSuccessful()));
+        JSONParser jsonParser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) jsonParser.parse(responseJson.toString());
 
+        int [] values;
+        values = new int[240];
+
+        for(int i=0; i < 1;i++){
+            JSONObject jsonObj = (JSONObject)jsonArray.get(i);
+            JSONObject temp = (JSONObject) jsonObj.get("timeOffsetStressLevelValues");
+
+            Log.e("aa",responseJson.toString());
+            Log.e("readline",temp.toJSONString());
+
+            // GET 12 hours data for every 3 minutes.  240 * 180 (3m) = 43200s (12hours)
+            for(int j=0 ; j< 240 ; j++){
+
+                String value = temp.get(Integer.toString(j * 180)).toString();
+                Log.e("dd",value);
+
+                if(value == null){
+                    values[j] = -1;
+                }
+                else{
+                    values[j] = Integer.parseInt(value);
+                }
+            }
+        }
+
+        return values;
     }
 }

@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -49,12 +48,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import stresstest.ntt.Garmin.MyOAuthConnect;
 import stresstest.ntt.mymanager.MyFileManager;
 import stresstest.ntt.mymanager.MySocketManager;
 import stresstest.ntt.smartband.LoginSettingActivity;
 
-import static stresstest.ntt.mymanager.MySocketManager.SOCKET_MSG.GET_BABYACTIVITY_UP;
 import static stresstest.ntt.mymanager.MySocketManager.SOCKET_MSG.SET_OPENAPP;
+
+
+// MomiCon
+
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
@@ -271,16 +274,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String fatherCommentString = "C1 0 0 AS 0 C2 0 S1 0 C3 0 0";
         String babyActivityUpString = "B1 DI B2 0 0 SL B3 B3 B3 0 B1 0";
         String babyActivityDownString = "B1 SL B3 0 SL 0 0 0 HO B2 B2 0";
+        String[] verlabels = new String[] { "", "High", "Medium" , "Low" , ""};
 
-        GraphView stressgraph;
         int nowHour;
-
-        float[] values;
-
         TableLayout icon_table;
-
         Date THIS_TIME;
         SimpleDateFormat save_date;
+
+        int [] values;
 
         public PlaceholderFragment() {
         }
@@ -301,22 +302,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
             final View rootView = inflater.inflate(R.layout.content_main, container, false);
             int page_num = getArguments().getInt(ARG_SECTION_NUMBER);
-            values = new float[240];
-            String[] verlabels = new String[] { "", "High", "Medium" , "Low" , ""};
 
+            values = new int[240];
+
+            /*
             Random a = new Random();
             for(int i=0 ; i<240 ;i++){
                 values[ i] = a.nextInt(100);
             }
+            */
 
             THIS_TIME = new Date();
             THIS_TIME.setTime(NOW_TIME.getTime() - ( (12 * 60 * 60 * 1000)* (TOTAL_PAGE - page_num) ));
 
-
             SimpleDateFormat date = new SimpleDateFormat("EEE, dd MMMM (a)");
             SimpleDateFormat time = new SimpleDateFormat("hh");
             save_date = new SimpleDateFormat("yyyyMMdda");
-
 
             ((TextView)rootView.findViewById(R.id.text_date)).setText(date.format(THIS_TIME));
 
@@ -328,18 +329,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             else if (now.compareTo("09") == 0) nowHour = 8; else if (now.compareTo("10") == 0) nowHour = 9;
             else if (now.compareTo("11") == 0) nowHour = 10; else if(now.compareTo("11") == 0) nowHour = 11;
 
+
+            LinearLayout graphView = ((LinearLayout)rootView.findViewById(R.id.graph_view));
+            GraphView stressgraph;
             stressgraph = new GraphView(getContext() , values, "", null , verlabels);
             stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 250 ));
 
-            LinearLayout graphView = ((LinearLayout)rootView.findViewById(R.id.graph_view));
             graphView.addView(stressgraph);
+
+            UpdateStressData mStressUpdate = new UpdateStressData(graphView , stressgraph) ;
+            mStressUpdate.execute((Void) null);
+
 
             babyViewList.clear(); motherViewList.clear(); motherEmotionList.clear(); ; motherEmotionListTemp.clear();
             fatherViewListA.clear(); fatherViewListB.clear(); babyIconList.clear(); motherIconList.clear();
             motherEmotionIconList.clear(); fatherIconListComment.clear(); fatherIconListAsk.clear(); fatherIconListSuggest.clear();
 
             icon_table = rootView.findViewById(R.id.icon_table);
-            List<Boolean> stressfulBox = findStressfullBox();
 
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t1));
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t2));
@@ -354,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t11));
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t12));
 
+            List<Boolean> stressfulBox = findStressfullBox();
             for(int i=0 ; i<stressfulBox.size() ; i++){
                 if(stressfulBox.get(i) == true){
                     motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape, null));
@@ -363,6 +370,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 else
                     motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_impossible, null));
             }
+
+
 
             motherViewList.add(rootView.findViewById(R.id.schedule_t1));
             motherViewList.add(rootView.findViewById(R.id.schedule_t2));
@@ -1101,6 +1110,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             return result;
         }
+
+
+        public class UpdateStressData extends AsyncTask<Void,Void,Boolean> {
+            LinearLayout graphView;
+            GraphView stressgraph;
+
+            UpdateStressData(LinearLayout _graphView , GraphView _stressgraph) {
+                graphView = _graphView;
+                stressgraph = _stressgraph;
+            }
+
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                try {
+                    MyOAuthConnect a = new MyOAuthConnect();
+                    values = a.sendGet();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean success) {
+                String[] verlabels = new String[] { "", "High", "Medium" , "Low" , ""};
+
+                Log.e("zz", Integer.toString(values[0]));
+                Log.e("zz", Integer.toString(values[1]));
+                Log.e("zz", Integer.toString(values[2]));
+                Log.e("zz", Integer.toString(values[3]));
+                Log.e("zz", Integer.toString(values[4]));
+                Log.e("zz", Integer.toString(values[5]));
+
+                graphView.removeView(stressgraph);
+                stressgraph = new GraphView(getContext() , values, "", null , verlabels);
+                stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 250 ));
+                graphView.addView(stressgraph);
+            }
+        }
+
 
         public class UpdateInterface extends AsyncTask<Void, Void, Boolean> {
 

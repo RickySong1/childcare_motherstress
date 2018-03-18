@@ -42,5 +42,6 @@ dependencies {
     compile files('libs/scribejava-core-5.2.0-java7again.jar')
     compile files('libs/httpclient-4.5.3.jar')
     compile files('libs/httpcore-4.4.6.jar')
+    compile 'com.googlecode.json-simple:json-simple:1.1'
 
 }
