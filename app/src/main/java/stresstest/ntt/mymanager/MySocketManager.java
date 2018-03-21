@@ -57,8 +57,8 @@ public class MySocketManager {
     String pre_message;
 
     public enum SOCKET_MSG {
-        GET_PAGE_COUNT ,  GET_FATHERCOMMENT , GET_MOTHERACTIVITY, GET_MOTHEREMOTION, GET_BABYACTIVITY_UP, GET_BABYACTIVITY_DOWN,
-        SET_OPENAPP , SET_FATHERCOMMENT , SET_MOTHERACTIVITY, SET_MOTHEREMOTION, SET_BABYACTIVITY_UP, SET_BABYACTIVITY_DOWN
+        GET_PAGE_COUNT ,  GET_FATHERCOMMENT , GET_MOTHERACTIVITY, GET_MOTHEREMOTION, GET_BABYACTIVITY_UP, GET_BABYACTIVITY_DOWN, GET_THRESHOLD,
+        SET_OPENAPP , SET_FATHERCOMMENT , SET_MOTHERACTIVITY, SET_MOTHEREMOTION, SET_BABYACTIVITY_UP, SET_BABYACTIVITY_DOWN, SET_STRESS_DATA
     }
 
     public MySocketManager(String _userType) {
@@ -92,13 +92,13 @@ public class MySocketManager {
                         send_message = pre_message+"SET_FATHERCOMMENT##"+_target_time+"##"+Integer.toString(viewid)+"##"+save_string+"##";
                         break;
                     case SET_BABYACTIVITY_UP:
-                         //언제 아기 위에 스케쥴을 고칠지,
                         send_message = pre_message+"SET_BABYACTIVITY_UP##"+_target_time+"##"+Integer.toString(viewid)+"##"+save_string+"##";
                         break;
                     case SET_BABYACTIVITY_DOWN:
-                         //언제 아기 밑에 스케쥴을 고칠지 확인해야하고,
-                         //그리고,  아이콘을 지우는것도 서버에 반영 할 수 있도록 하자.
                         send_message = pre_message+"SET_BABYACTIVITY_DOWN##"+_target_time+"##"+Integer.toString(viewid)+"##"+save_string+"##";
+                        break;
+                    case SET_STRESS_DATA:
+                        send_message = pre_message+"SET_STRESS_DATA##"+_target_time+"##"+"0"+"##"+save_string+"##";
                         break;
                 }
 
@@ -131,7 +131,10 @@ public class MySocketManager {
 
                 switch(msg){
                     case GET_PAGE_COUNT:
-                        send_message = pre_message+"GET_PAGE_COUNT##";
+                        send_message = pre_message+"GET_PAGE_COUNT##"+date+"##";
+                        break;
+                    case GET_THRESHOLD:
+                        send_message = pre_message+"GET_THRESHOLD##"+date+"##";
                         break;
                     case GET_MOTHEREMOTION:
                         send_message = pre_message+"GET_MOTHEREMOTION##"+date+"##";

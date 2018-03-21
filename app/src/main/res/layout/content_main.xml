@@ -32,7 +32,7 @@
             android:layout_marginLeft="10dp"
             />
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/graph_view"
             android:orientation="vertical"
             android:background="#e1e1e1"
@@ -40,7 +40,20 @@
             android:layout_marginRight="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-        </LinearLayout>
+
+            <LinearLayout
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ProgressBar
+                    android:id="@+id/stress_progress"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+            </LinearLayout>
+        </RelativeLayout>
 
 
         <TableRow
@@ -57,7 +70,14 @@
                 android:layout_weight="2"
                 android:stretchColumns="*">
 
-                <TableRow>
+                <TableRow
+                    android:id="@+id/time_am">
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="00" />
                     <TextView
                         android:layout_weight="1"
                         android:layout_width="0dp"
@@ -124,12 +144,82 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="11" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/time_pm">
                     <TextView
                         android:layout_weight="1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="12" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="13" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="14" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="15" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="16" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="17" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="18" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="19" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="20" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="21" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="22" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="23" />
                 </TableRow>
 
 
@@ -187,7 +277,7 @@
                         android:layout_height="35dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:background="@drawable/shape"
+                        android:background="@drawable/shape_impossible"
                         android:orientation="vertical">
                     </LinearLayout>
 
@@ -404,7 +494,7 @@
                 <TextView
                     android:textStyle="bold"
                     android:layout_marginTop="10dp"
-                    android:text="아빠 코멘트"
+                    android:text="아빠 응답"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:textColor="#666666"
@@ -710,7 +800,7 @@
                             android:layout_weight="1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_food_small"/>
+                            app:srcCompat="@drawable/ic_food_small"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -734,7 +824,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:src="@drawable/diaper_pee"/>
+                            app:srcCompat="@drawable/diaper_pee"/>
 
                     <ImageView
                         android:padding="2dp"
@@ -742,7 +832,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_baby_poop"/>
+                        app:srcCompat="@drawable/ic_baby_poop"/>
 
 
 
@@ -752,21 +842,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_sleeping_baby"/>
+                        app:srcCompat="@drawable/ic_sleeping_baby"/>
                     <ImageView
                         android:padding="2dp"
                         android:id="@+id/activity_btn_t5"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_bath"/>
+                        app:srcCompat="@drawable/ic_bath"/>
                     <ImageView
                         android:padding="2dp"
                         android:id="@+id/activity_btn_t6"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_motherhood"/>
+                        app:srcCompat="@drawable/ic_motherhood"/>
 
                 </TableRow>
 
@@ -780,36 +870,42 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textColor="#000000"
                         android:text="식사"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textColor="#000000"
                         android:text="기저귀"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textColor="#000000"
                         android:text="대변"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textColor="#000000"
                         android:text="잠자기"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textColor="#000000"
                         android:text="목욕"/>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:textColor="#000000"
                         android:text="아기보기"/>
                 </TableRow>
 
@@ -858,7 +954,7 @@
                             android:id="@+id/activity_btn_m1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_rise_m"/>
+                            app:srcCompat="@drawable/ic_rise_m"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -882,7 +978,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_rest"/>
+                        app:srcCompat="@drawable/ic_rest"/>
 
 
                     <RelativeLayout
@@ -897,7 +993,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:src="@drawable/ic_emotion_lv3"/>
+                            app:srcCompat="@drawable/ic_emotion_lv3"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -927,7 +1023,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:src="@drawable/ic_father_thumsup"/>
+                            app:srcCompat="@drawable/ic_father_thumsup"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -950,7 +1046,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_father_ask"/>
+                        app:srcCompat="@drawable/ic_father_ask"/>
 
                     <RelativeLayout
                         android:layout_gravity="center"
@@ -964,7 +1060,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:src="@drawable/ic_father_rise_sug"/>
+                            app:srcCompat="@drawable/ic_father_rise_sug"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -991,18 +1087,23 @@
                     android:layout_weight="1">
 
                     <TextView
+                        android:id="@+id/mother_text1"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="식사"/>
+
                     <TextView
+                        android:id="@+id/mother_text2"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="휴식"/>
+
                     <TextView
+                        android:id="@+id/mother_text3"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -1010,6 +1111,7 @@
                         android:text="감정"/>
 
                     <TextView
+                        android:id="@+id/father_text1"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -1017,6 +1119,7 @@
                         android:text="코멘트"/>
 
                     <TextView
+                        android:id="@+id/father_text2"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -1024,6 +1127,7 @@
                         android:text="묻기"/>
 
                     <TextView
+                        android:id="@+id/father_text3"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -1031,15 +1135,7 @@
                         android:text="제안"/>
 
                 </TableRow>
-
             </TableLayout>
-
-
-
         </TableRow>
-
-
     </TableLayout>
-
-
 </android.support.constraint.ConstraintLayout>

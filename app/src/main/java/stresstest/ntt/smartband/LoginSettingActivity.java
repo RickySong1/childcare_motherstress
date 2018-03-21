@@ -85,6 +85,10 @@ public class LoginSettingActivity extends AppCompatActivity  {
         if(permissionCheck < 0) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
+        permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.REORDER_TASKS);
+        if(permissionCheck < 0) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.REORDER_TASKS}, 1);
+        }
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -192,7 +196,7 @@ public class LoginSettingActivity extends AppCompatActivity  {
 
             try {
                 // Simulate network access.
-                Thread.sleep(2000);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 return false;
             }

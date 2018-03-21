@@ -16,7 +16,7 @@ import android.widget.TableRow;
  */
 public class GraphView extends View {
 
-    public static final int HIGH_STRESS_SCORE = 50;
+    public static int HIGH_STRESS_SCORE = 50;
 
     public static boolean BAR = true;
     public static boolean LINE = false;
@@ -26,9 +26,14 @@ public class GraphView extends View {
     private String[] verlabels;
     private String title;
 
+
+
     private boolean type;
-    public GraphView(Context context, int [] values, String title, String[] horlabels, String[] verlabels) {
+    public GraphView(Context context, int [] values, String title, String[] horlabels, String[] verlabels , int threshold) {
         super(context);
+
+        HIGH_STRESS_SCORE = threshold;
+
         if (values == null)
             values = new int[0];
         else
@@ -66,7 +71,6 @@ public class GraphView extends View {
         float graphheight = height;
         float graphwidth = width;
 
-
         /*
         int hors = horlabels.length - 1;
         for (int i = 0; i < horlabels.length; i++) {
@@ -96,7 +100,6 @@ public class GraphView extends View {
                     float rat = val / diff;
                     float h = graphheight * rat;
 
-
                     if(values[i] >= HIGH_STRESS_SCORE)
                         paint.setARGB(255 ,  255 ,  30 , 30);
                     else
@@ -104,7 +107,6 @@ public class GraphView extends View {
 
                     canvas.drawRect((i * colwidth) + horstart, (border - h) + graphheight, ((i * colwidth) + horstart) + (colwidth - 1), height - (border - 1), paint);
                 }
-
         }
         int vers = verlabels.length - 1;
 
@@ -124,14 +126,12 @@ public class GraphView extends View {
     }
 
     private float getMax() {
-
         float largest = Integer.MIN_VALUE;
         for (int i = 0; i < values.length; i++)
             if (values[i] > largest)
                 largest = values[i];
 
         //return largest;
-
         return 100;
     }
     private float getMin() {
@@ -160,6 +160,5 @@ public class GraphView extends View {
 
         setMeasuredDimension(width - paddingWidth, height - paddingHeight);
     }
-
 
 }

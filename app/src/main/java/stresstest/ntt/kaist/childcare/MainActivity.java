@@ -1,13 +1,16 @@
 package stresstest.ntt.kaist.childcare;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -19,6 +22,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -37,6 +41,8 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -44,6 +50,7 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -55,11 +62,13 @@ import stresstest.ntt.smartband.LoginSettingActivity;
 
 import static stresstest.ntt.mymanager.MySocketManager.SOCKET_MSG.SET_OPENAPP;
 
-
 // MomiCon
 
-
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
 
     public static final int BABY = 0;
     public static final int MOTHER = 1;
@@ -114,10 +123,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //intent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
         //MainActivity.this.startActivity(intent);
-
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+        // Start Garmin application to initiate Sync.
+        Intent garminintent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
+        if(garminintent != null) {
+            MainActivity.this.startActivity(garminintent);
+        }else{
+            Toast.makeText(getApplicationContext(), "GARMIN Connector를 설치해주세요." ,  Toast.LENGTH_SHORT).show();
+        }
+
+        // Also start my application running on the background.
+        new Thread(new Runnable() { @Override public void run() {
+            /*
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Log.e("new",e.toString());
+            }
+            */
+            ActivityManager am = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.AppTask> appTask = am.getAppTasks();
+            for(ActivityManager.AppTask task : appTask ) {
+                ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
+                String packageName = taskInfo.baseIntent.getComponent().getPackageName();
+                if(packageName.equals(getPackageName()));
+                am.moveTaskToFront(task.getTaskInfo().id, 0);
+            }
+        }
+        }).start();
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -177,7 +215,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         @Override
         protected Boolean doInBackground(Void... params) {
             socketM = new MySocketManager(USER_ID);
-            TOTAL_PAGE = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_PAGE_COUNT , null));
+            SimpleDateFormat save_date = new SimpleDateFormat("yyyyMMdda");
+            TOTAL_PAGE = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_PAGE_COUNT, save_date.format(NOW_TIME)));
             return true;
         }
 
@@ -235,8 +274,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent intent=new Intent(MainActivity.this, LoginSettingActivity.class);
             startActivity(intent);
         }else if( id == R.id.nav_smartband){
+
+            // Start garmin application to initiate Sync.
             Intent intent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
             MainActivity.this.startActivity(intent);
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -312,41 +354,98 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             */
 
+            SimpleDateFormat date = new SimpleDateFormat("EEE, dd MMMM (a)");
+            SimpleDateFormat time = new SimpleDateFormat("HH");
+            SimpleDateFormat real_time = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+            save_date = new SimpleDateFormat("yyyyMMdda");
+
+            Date ttoday = new Date();
+
             THIS_TIME = new Date();
             THIS_TIME.setTime(NOW_TIME.getTime() - ( (12 * 60 * 60 * 1000)* (TOTAL_PAGE - page_num) ));
 
-            SimpleDateFormat date = new SimpleDateFormat("EEE, dd MMMM (a)");
-            SimpleDateFormat time = new SimpleDateFormat("hh");
-            save_date = new SimpleDateFormat("yyyyMMdda");
+            Calendar cal_for_stress_request_start = Calendar.getInstance();
+            Calendar cal_for_stress_request_end = Calendar.getInstance();
+
+            cal_for_stress_request_start.setTime(THIS_TIME);
+            cal_for_stress_request_end.setTime(THIS_TIME);
+
+            if ( save_date.format(THIS_TIME).contains("AM")){ //
+                ((TableRow)rootView.findViewById(R.id.time_am)).setVisibility(TableRow.VISIBLE);
+                ((TableRow)rootView.findViewById(R.id.time_pm)).setVisibility(TableRow.GONE);
+                cal_for_stress_request_start.set(cal_for_stress_request_start.get(Calendar.YEAR) , cal_for_stress_request_start.get(Calendar.MONTH) , cal_for_stress_request_start.get(Calendar.DAY_OF_MONTH) ,
+                        0 , 0 , 0 );
+                cal_for_stress_request_end.set(cal_for_stress_request_end.get(Calendar.YEAR) , cal_for_stress_request_end.get(Calendar.MONTH) , cal_for_stress_request_end.get(Calendar.DAY_OF_MONTH) ,
+                        23 , 59, 59);
+                cal_for_stress_request_end.setTimeInMillis( cal_for_stress_request_end.getTimeInMillis()+1000 );
+            }else { // PM
+                ((TableRow)rootView.findViewById(R.id.time_am)).setVisibility(TableRow.GONE);
+                ((TableRow)rootView.findViewById(R.id.time_pm)).setVisibility(TableRow.VISIBLE);
+                cal_for_stress_request_start.set(cal_for_stress_request_start.get(Calendar.YEAR) , cal_for_stress_request_start.get(Calendar.MONTH) , cal_for_stress_request_start.get(Calendar.DAY_OF_MONTH) ,
+                        0 , 0 , 0 );
+                cal_for_stress_request_end.set(cal_for_stress_request_end.get(Calendar.YEAR) , cal_for_stress_request_end.get(Calendar.MONTH) , cal_for_stress_request_end.get(Calendar.DAY_OF_MONTH) ,
+                        23 , 59 , 59 );
+                cal_for_stress_request_end.setTimeInMillis( cal_for_stress_request_end.getTimeInMillis()+1000 );
+            }
 
             ((TextView)rootView.findViewById(R.id.text_date)).setText(date.format(THIS_TIME));
 
             String now = time.format(THIS_TIME);
-            if(now.compareTo("01") == 0) nowHour =0; else if(now.compareTo("02") == 0) nowHour = 1;
-            else if (now.compareTo("03") == 0) nowHour = 2; else if (now.compareTo("04") == 0) nowHour = 3;
-            else if (now.compareTo("05") == 0) nowHour = 4; else if (now.compareTo("06") == 0) nowHour = 5;
-            else if (now.compareTo("07") == 0) nowHour = 6; else if (now.compareTo("08") == 0) nowHour = 7;
-            else if (now.compareTo("09") == 0) nowHour = 8; else if (now.compareTo("10") == 0) nowHour = 9;
-            else if (now.compareTo("11") == 0) nowHour = 10; else if(now.compareTo("11") == 0) nowHour = 11;
 
+            if(now.compareTo("00") == 0) nowHour =0; else if(now.compareTo("01") == 0) nowHour = 1;
+            else if (now.compareTo("02") == 0) nowHour = 2; else if (now.compareTo("03") == 0) nowHour = 3;
+            else if (now.compareTo("04") == 0) nowHour = 4; else if (now.compareTo("05") == 0) nowHour = 5;
+            else if (now.compareTo("06") == 0) nowHour = 6; else if (now.compareTo("07") == 0) nowHour = 7;
+            else if (now.compareTo("08") == 0) nowHour = 8; else if (now.compareTo("09") == 0) nowHour = 9;
+            else if (now.compareTo("10") == 0) nowHour = 10; else if(now.compareTo("11") == 0) nowHour = 11;
+            else if(now.compareTo("12") == 0) nowHour = 0; else if(now.compareTo("13") == 0) nowHour = 1;
+            else if(now.compareTo("14") == 0) nowHour = 2; else if(now.compareTo("15") == 0) nowHour = 3;
+            else if(now.compareTo("16") == 0) nowHour = 4; else if(now.compareTo("17") == 0) nowHour = 5;
+            else if(now.compareTo("18") == 0) nowHour = 6; else if(now.compareTo("19") == 0) nowHour = 7;
+            else if(now.compareTo("20") == 0) nowHour = 8; else if(now.compareTo("21") == 0) nowHour = 9;
+            else if(now.compareTo("23") == 0) nowHour = 10; else if(now.compareTo("23") == 0) nowHour = 11;
 
-            LinearLayout graphView = ((LinearLayout)rootView.findViewById(R.id.graph_view));
+            ProgressBar loading = ((ProgressBar)rootView.findViewById(R.id.stress_progress));
+            RelativeLayout graphView = ((RelativeLayout)rootView.findViewById(R.id.graph_view));
             GraphView stressgraph;
-            stressgraph = new GraphView(getContext() , values, "", null , verlabels);
+            stressgraph = new GraphView(getContext() , values, "", null , verlabels , 60);
             stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 250 ));
 
             graphView.addView(stressgraph);
 
-            UpdateStressData mStressUpdate = new UpdateStressData(graphView , stressgraph) ;
+            UpdateStressData mStressUpdate = new UpdateStressData(graphView , stressgraph , loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000) , Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000)) ;
             mStressUpdate.execute((Void) null);
 
 
+            if( MainActivity.USER_TYPE == USER_TYPE_ENUM.MOTHER){
+                ((TextView)rootView.findViewById(R.id.father_text1)).setTextColor(Color.parseColor("#cacaca"));
+                ((TextView)rootView.findViewById(R.id.father_text2)).setTextColor(Color.parseColor("#cacaca"));
+                ((TextView)rootView.findViewById(R.id.father_text3)).setTextColor(Color.parseColor("#cacaca"));
+                ((TextView)rootView.findViewById(R.id.mother_text1)).setTextColor(Color.parseColor("#000000"));
+                ((TextView)rootView.findViewById(R.id.mother_text2)).setTextColor(Color.parseColor("#000000"));
+                ((TextView)rootView.findViewById(R.id.mother_text3)).setTextColor(Color.parseColor("#000000"));
+                ((ImageView)(rootView.findViewById(R.id.activity_btn_m4))).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_thumsup_grey, null));
+                ((ImageView)(rootView.findViewById(R.id.activity_btn_m5))).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_ask_grey, null));
+                ((ImageView)(rootView.findViewById(R.id.activity_btn_m6))).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rise_sug_grey, null));
+
+            }else if (USER_TYPE == USER_TYPE_ENUM.FATHER){
+                ((TextView)rootView.findViewById(R.id.father_text1)).setTextColor(Color.parseColor("#000000"));
+                ((TextView)rootView.findViewById(R.id.father_text2)).setTextColor(Color.parseColor("#000000"));
+                ((TextView)rootView.findViewById(R.id.father_text3)).setTextColor(Color.parseColor("#000000"));
+                ((TextView)rootView.findViewById(R.id.mother_text1)).setTextColor(Color.parseColor("#cacaca"));
+                ((TextView)rootView.findViewById(R.id.mother_text2)).setTextColor(Color.parseColor("#cacaca"));
+                ((TextView)rootView.findViewById(R.id.mother_text3)).setTextColor(Color.parseColor("#cacaca"));
+                ((ImageView)(rootView.findViewById(R.id.activity_btn_m1))).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_m_grey, null));
+                ((ImageView)(rootView.findViewById(R.id.activity_btn_m2))).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rest_grey, null));
+                ((ImageView)(rootView.findViewById(R.id.activity_btn_m3))).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv3_grey, null));
+            }
+
+
             babyViewList.clear(); motherViewList.clear(); motherEmotionList.clear(); ; motherEmotionListTemp.clear();
-            fatherViewListA.clear(); fatherViewListB.clear(); babyIconList.clear(); motherIconList.clear();
+            fatherViewListA.clear(); fatherViewListB.clear(); babyIconList.clear(); motherIconList.clear(); fatherViewListTemp.clear();
             motherEmotionIconList.clear(); fatherIconListComment.clear(); fatherIconListAsk.clear(); fatherIconListSuggest.clear();
 
-            icon_table = rootView.findViewById(R.id.icon_table);
-
+            icon_table = (TableLayout) rootView.findViewById(R.id.icon_table);
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t1));
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t2));
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t3));
@@ -359,19 +458,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t10));
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t11));
             motherEmotionListTemp.add(rootView.findViewById(R.id.emotion_t12));
-
-            List<Boolean> stressfulBox = findStressfullBox();
-            for(int i=0 ; i<stressfulBox.size() ; i++){
-                if(stressfulBox.get(i) == true){
-                    motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape, null));
-                    motherEmotionList.add(motherEmotionListTemp.get(i));
-                    motherEmotionList.get(motherEmotionList.size()-1).setLabelFor(i); // just added value
-                }
-                else
-                    motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_impossible, null));
-            }
-
-
 
             motherViewList.add(rootView.findViewById(R.id.schedule_t1));
             motherViewList.add(rootView.findViewById(R.id.schedule_t2));
@@ -444,31 +530,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             for(int i=0 ; i< babyViewList.size() ; i++){
                 babyViewList.get(i).setOnDragListener(new MyDragListener(BABY,i));
-                babyViewList.get(i).setOnClickListener(new MyTableClearListener());
+                babyViewList.get(i).setOnClickListener(new MyTableClearListener(BABY,i));
                 babyViewList.get(i).setLabelFor(i);
             }
             for(int i=0 ; i< motherViewList.size() ; i++){
                 motherViewList.get(i).setOnDragListener(new MyDragListener(MOTHER,i));
-                motherViewList.get(i).setOnClickListener(new MyTableClearListener());
+                motherViewList.get(i).setOnClickListener(new MyTableClearListener(MOTHER,i));
                 motherViewList.get(i).setLabelFor(i);
-            }
-            for(int i=0 ; i < motherEmotionList.size() ; i++){
-                motherEmotionList.get(i).setOnDragListener(new MyDragListener(MOTHER_EMOTION, i));
-                motherEmotionList.get(i).setOnClickListener(new MyTableClearListener());
-                //motherEmotionList.get(i).setLabelFor(i);  // already setup before
             }
 
             for(int i=0 ; i< fatherViewListTemp.size() ; i++){
                 fatherViewListTemp.get(i).setLabelFor(i);
+                fatherViewListTemp.get(i).setOnClickListener(new MyTableClearListener(FATHER_COMMENT,i));
             }
 
             for(int i=0 ; i< fatherViewListA.size() ; i++){
                 fatherViewListA.get(i).setOnDragListener(new MyDragListener(FATHER_ASK,i));
-                fatherViewListA.get(i).setOnClickListener(new MyTableClearListener());
+
             }
             for(int i=0 ; i< fatherViewListB.size() ; i++){
                 fatherViewListB.get(i).setOnDragListener(new MyDragListener(FATHER_SUGGESTION,i));
-                fatherViewListB.get(i).setOnClickListener(new MyTableClearListener());
             }
 
             for(int i=0 ; i <  babyIconList.size() ; i++){
@@ -639,8 +720,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int id;
 
             MyIconTouchClickListener(ICON_GROUP _boxO , int _id){
-
-
+                boxOwner = _boxO;
             }
 
             public boolean onTouch(View v, MotionEvent event) {
@@ -656,6 +736,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         m_mode = NONE;
                         break;
                     case MotionEvent.ACTION_MOVE:
+                        boolean error = false;
+
+                        if(USER_TYPE == USER_TYPE_ENUM.FATHER &&  (boxOwner == ICON_GROUP.MOTHER_ACTIVITY || boxOwner == ICON_GROUP.MOTHER_EMOTION)) {
+                            Toast.makeText(getContext(), "Can't use mother's icon" ,  Toast.LENGTH_SHORT).show();
+                            break;
+                        }else if (USER_TYPE == USER_TYPE_ENUM.MOTHER &&  (boxOwner == ICON_GROUP.FATHER_ASK || boxOwner == ICON_GROUP.FATHER_COMMENT || boxOwner == ICON_GROUP.FATHER_SUGGESTION) ) {
+                            Toast.makeText(getContext(), "Can't use father's icon" ,  Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+
                         if (Math.abs(event.getX()) + Math.abs(event.getY()) > MAX_MOVE ) {
                             m_mode = DRAG;
                             ClipData data = ClipData.newPlainText("", "");
@@ -839,7 +929,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         private final class MyTableClearListener implements View.OnClickListener{
-                public void onClick(View v) {
+
+            int boxOwner;
+            int array_id;
+
+            MyTableClearListener(int _boxOwner , int _id){
+                boxOwner = _boxOwner;
+                array_id = _id;
+            }
+
+
+            public void onClick(final View v) {
                     final LinearLayout container = (LinearLayout) v;
                     if (((ViewGroup) container).getChildCount() > 0) {
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
@@ -849,6 +949,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         for (int index = 0; index < ((ViewGroup) container).getChildCount(); ++index) {
+
+                                            switch(boxOwner){
+                                                case BABY:
+                                                    socketM = new MySocketManager(USER_ID);
+                                                    if( ((ViewGroup) container).getChildCount() > 1){
+                                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_BABYACTIVITY_DOWN, save_date.format(THIS_TIME) , array_id, "0");
+                                                    }else {
+                                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_BABYACTIVITY_UP, save_date.format(THIS_TIME) , array_id ,  "0");
+                                                    }
+                                                    break;
+                                                case MOTHER:
+                                                    socketM = new MySocketManager(USER_ID);
+                                                    socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHERACTIVITY, save_date.format(THIS_TIME) , array_id , "0") ;
+                                                    break;
+                                                case MOTHER_EMOTION:
+                                                    socketM = new MySocketManager(USER_ID);
+                                                    socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHEREMOTION, save_date.format(THIS_TIME) , v.getLabelFor() , "0") ;  // Mother emoticon index is different
+                                                    break;
+                                                case FATHER_COMMENT:
+                                                    socketM = new MySocketManager(USER_ID);
+                                                    socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT, save_date.format(THIS_TIME) , v.getLabelFor() , "0") ;
+                                                    break;
+                                            }
+
                                             ((ViewGroup) container).removeView(((ViewGroup) container).getChildAt(index));
                                         }
                                     }
@@ -984,7 +1108,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             switch(boxOwner){
                                 case BABY:
                                     socketM = new MySocketManager(USER_ID);
-                                    //socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET);
+                                    if( ((ViewGroup) container).getChildCount() > 1){
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_BABYACTIVITY_DOWN, save_date.format(THIS_TIME) , id ,  save_icon_string);
+                                    }else {
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_BABYACTIVITY_UP, save_date.format(THIS_TIME) , id ,  save_icon_string);
+                                    }
                                     break;
                                 case MOTHER:
                                     socketM = new MySocketManager(USER_ID);
@@ -1080,7 +1208,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return "NULL";
         }
 
-
         public static boolean areDrawablesIdentical(Drawable drawableA, Drawable drawableB) {
             Drawable.ConstantState stateA = drawableA.getConstantState();
             Drawable.ConstantState stateB = drawableB.getConstantState();
@@ -1111,45 +1238,65 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return result;
         }
 
-
         public class UpdateStressData extends AsyncTask<Void,Void,Boolean> {
-            LinearLayout graphView;
+            RelativeLayout graphView;
             GraphView stressgraph;
+            ProgressBar loading;
+            String start;
+            String end;
+            int thres = 50;
 
-            UpdateStressData(LinearLayout _graphView , GraphView _stressgraph) {
+            UpdateStressData(RelativeLayout _graphView , GraphView _stressgraph , ProgressBar _loading , String _start , String _end) {
                 graphView = _graphView;
                 stressgraph = _stressgraph;
+                loading = _loading;
+                start = _start;
+                end = _end;
             }
 
             @Override
             protected Boolean doInBackground(Void... voids) {
                 try {
-                    MyOAuthConnect a = new MyOAuthConnect();
-                    values = a.sendGet();
+                    MyOAuthConnect a = new MyOAuthConnect(save_date.format(THIS_TIME));
+                    values = a.sendGet(start , end);
+
+                    MySocketManager socketM = new MySocketManager(USER_ID);
+                    thres = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_THRESHOLD , save_date.format(THIS_TIME)));
+
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e("Exception",e.toString());
                 }
                 return false;
             }
 
             @Override
             protected void onPostExecute(Boolean success) {
-                String[] verlabels = new String[] { "", "High", "Medium" , "Low" , ""};
-
-                Log.e("zz", Integer.toString(values[0]));
-                Log.e("zz", Integer.toString(values[1]));
-                Log.e("zz", Integer.toString(values[2]));
-                Log.e("zz", Integer.toString(values[3]));
-                Log.e("zz", Integer.toString(values[4]));
-                Log.e("zz", Integer.toString(values[5]));
-
+                // LOAD MOTHER STRESS VALUE
                 graphView.removeView(stressgraph);
-                stressgraph = new GraphView(getContext() , values, "", null , verlabels);
+                stressgraph = new GraphView(getContext() , values, "", null , verlabels, thres);
                 stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 250 ));
                 graphView.addView(stressgraph);
+                loading.setVisibility(ProgressBar.GONE);
+
+                // SET MOTHERS STRESS BOX
+                List<Boolean> stressfulBox = findStressfullBox();
+                for(int i=0 ; i<stressfulBox.size() ; i++){
+                    if(stressfulBox.get(i) == true){
+                        motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape, null));
+                        motherEmotionList.add(motherEmotionListTemp.get(i));
+                        motherEmotionList.get(motherEmotionList.size()-1).setLabelFor(i); // just added value
+                    }
+                    else
+                        motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_impossible, null));
+                }
+
+                for(int i=0 ; i < motherEmotionList.size() ; i++){
+                    motherEmotionList.get(i).setOnDragListener(new MyDragListener(MOTHER_EMOTION, i));
+                    motherEmotionList.get(i).setOnClickListener(new MyTableClearListener(MOTHER_EMOTION, i));
+                    //motherEmotionList.get(i).setLabelFor(i);  // already setup before
+                }
             }
         }
-
 
         public class UpdateInterface extends AsyncTask<Void, Void, Boolean> {
 

@@ -19,6 +19,7 @@ public class MyFileManager {
 
     public static String saveFolderLocation = Environment.getExternalStorageDirectory().getAbsolutePath()+ "/MotherIsTried";
     private String userInfoFile = "userInformation.txt";
+    private String tempFile = "tempFile.txt";
 
     public boolean initNewFile(String user_id){
 
@@ -43,6 +44,29 @@ public class MyFileManager {
             Log.e("MSG",tempFileString +" writing error");
         }
         return false;
+    }
+
+    public void write(String sentence){
+        File folder = new File(saveFolderLocation);
+        if ( !folder.exists() ) {
+            if (!folder.mkdirs()) { Log.e("TravellerLog :: ", "Problem creating folder: "+saveFolderLocation); }
+        }
+
+        FileOutputStream fileWriter = null;
+        BufferedWriter bw = null;
+
+        String tempFileString = saveFolderLocation +"/"+tempFile;
+        try {
+            fileWriter = new FileOutputStream(tempFileString,true);
+            bw = new BufferedWriter(new OutputStreamWriter(fileWriter));
+            bw.write(sentence);
+            bw.write("\n\n");
+            bw.flush();
+            fileWriter.close();
+            bw.close();
+        }catch (Exception e ){
+            Log.e("MSG",tempFileString +" writing error");
+        }
     }
 
     public boolean isUserInfo() {
