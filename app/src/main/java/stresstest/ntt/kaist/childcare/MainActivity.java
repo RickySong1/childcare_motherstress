@@ -23,6 +23,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -54,6 +55,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import stresstest.ntt.Garmin.MyOAuthConnect;
 import stresstest.ntt.mymanager.MyFileManager;
@@ -61,8 +64,6 @@ import stresstest.ntt.mymanager.MySocketManager;
 import stresstest.ntt.smartband.LoginSettingActivity;
 
 import static stresstest.ntt.mymanager.MySocketManager.SOCKET_MSG.SET_OPENAPP;
-
-// MomiCon
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
@@ -78,7 +79,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int FATHER_SUGGESTION = 5;  // After time slot  ,  SUGGESTION
     public static int TOTAL_PAGE; // TOTAL_PAGE
     public static Date NOW_TIME;
-
+    public static boolean running = false;
+    public static Resources res;
     public enum USER_TYPE_ENUM {
         MOTHER, FATHER
     }
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static String USER_ID = "";
     public static  USER_TYPE_ENUM USER_TYPE;
 
-    private ViewPager mViewPager;
+    public ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     public static MySocketManager socketM;
@@ -113,13 +115,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return false;
     }
 
-    public enum Type {
-        MOTHER_STRESS, FATHER_BEFORE, FATHER_AFTER
+    public enum communicationType {
+        MOTHER_STRESS_START, FATHER_WAITING, MOTHER_MSG
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        Log.e("zz","start");
+        running = true;
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Log.e("zz","stop");
+        running = false;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        res = getResources();
 
         //intent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
         //MainActivity.this.startActivity(intent);
@@ -138,20 +156,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Also start my application running on the background.
         new Thread(new Runnable() { @Override public void run() {
-            /*
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 Log.e("new",e.toString());
             }
-            */
+
             ActivityManager am = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
             List<ActivityManager.AppTask> appTask = am.getAppTasks();
             for(ActivityManager.AppTask task : appTask ) {
                 ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
                 String packageName = taskInfo.baseIntent.getComponent().getPackageName();
                 if(packageName.equals(getPackageName()));
-                am.moveTaskToFront(task.getTaskInfo().id, 0);
+                    am.moveTaskToFront(task.getTaskInfo().id, 0);
             }
         }
         }).start();
@@ -364,8 +382,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             THIS_TIME = new Date();
             THIS_TIME.setTime(NOW_TIME.getTime() - ( (12 * 60 * 60 * 1000)* (TOTAL_PAGE - page_num) ));
 
-            Calendar cal_for_stress_request_start = Calendar.getInstance();
-            Calendar cal_for_stress_request_end = Calendar.getInstance();
+            final Calendar cal_for_stress_request_start = Calendar.getInstance();
+            final Calendar cal_for_stress_request_end = Calendar.getInstance();
 
             cal_for_stress_request_start.setTime(THIS_TIME);
             cal_for_stress_request_end.setTime(THIS_TIME);
@@ -403,18 +421,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             else if(now.compareTo("16") == 0) nowHour = 4; else if(now.compareTo("17") == 0) nowHour = 5;
             else if(now.compareTo("18") == 0) nowHour = 6; else if(now.compareTo("19") == 0) nowHour = 7;
             else if(now.compareTo("20") == 0) nowHour = 8; else if(now.compareTo("21") == 0) nowHour = 9;
-            else if(now.compareTo("23") == 0) nowHour = 10; else if(now.compareTo("23") == 0) nowHour = 11;
+            else if(now.compareTo("22") == 0) nowHour = 10; else if(now.compareTo("23") == 0) nowHour = 11;
 
-            ProgressBar loading = ((ProgressBar)rootView.findViewById(R.id.stress_progress));
-            RelativeLayout graphView = ((RelativeLayout)rootView.findViewById(R.id.graph_view));
-            GraphView stressgraph;
+            final ProgressBar loading = ((ProgressBar)rootView.findViewById(R.id.stress_progress));
+            final RelativeLayout graphView = ((RelativeLayout)rootView.findViewById(R.id.graph_view));
+            final GraphView stressgraph;
             stressgraph = new GraphView(getContext() , values, "", null , verlabels , 60);
-            stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 250 ));
 
+            DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+            int width = dm.widthPixels;
+            int height = dm.heightPixels;
+            stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , height/9 ));
             graphView.addView(stressgraph);
-
-            UpdateStressData mStressUpdate = new UpdateStressData(graphView , stressgraph , loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000) , Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000)) ;
-            mStressUpdate.execute((Void) null);
 
 
             if( MainActivity.USER_TYPE == USER_TYPE_ENUM.MOTHER){
@@ -531,17 +549,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             for(int i=0 ; i< babyViewList.size() ; i++){
                 babyViewList.get(i).setOnDragListener(new MyDragListener(BABY,i));
                 babyViewList.get(i).setOnClickListener(new MyTableClearListener(BABY,i));
+                babyViewList.get(i).setOnLongClickListener(new MyTableLongListener());
                 babyViewList.get(i).setLabelFor(i);
             }
             for(int i=0 ; i< motherViewList.size() ; i++){
                 motherViewList.get(i).setOnDragListener(new MyDragListener(MOTHER,i));
                 motherViewList.get(i).setOnClickListener(new MyTableClearListener(MOTHER,i));
+                motherViewList.get(i).setOnLongClickListener(new MyTableLongListener());
                 motherViewList.get(i).setLabelFor(i);
             }
 
             for(int i=0 ; i< fatherViewListTemp.size() ; i++){
                 fatherViewListTemp.get(i).setLabelFor(i);
                 fatherViewListTemp.get(i).setOnClickListener(new MyTableClearListener(FATHER_COMMENT,i));
+                fatherViewListTemp.get(i).setOnLongClickListener(new MyTableLongListener());
             }
 
             for(int i=0 ; i< fatherViewListA.size() ; i++){
@@ -552,64 +573,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fatherViewListB.get(i).setOnDragListener(new MyDragListener(FATHER_SUGGESTION,i));
             }
 
-            for(int i=0 ; i <  babyIconList.size() ; i++){
-                babyIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.BABY_ACTIVITY , i));
-                if(i==0)
-                    babyIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.BABY_FEED));
-                else {
-                    babyIconList.get(i).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다." ,  Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-
-            for(int i=0 ; i < motherIconList.size() ; i++){
-                motherIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.MOTHER_ACTIVITY,i));
-                if(i==0)
-                    motherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.MOTHER_FOOD));
-                else {
-                    motherIconList.get(i).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-
-            for(int i=0 ; i < motherEmotionIconList.size() ; i++){
-                motherEmotionIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.MOTHER_EMOTION,i));
-                if(i==0)
-                    motherEmotionIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.MOTHER_EMOTION));
-                else {
-                    motherEmotionIconList.get(i).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            }
-            for(int i=0 ; i < fatherIconListComment.size() ; i++) {
-                fatherIconListComment.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_COMMENT,i));
-                fatherIconListComment.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_COMMENT));
-            }
-            for(int i=0 ; i < fatherIconListAsk.size() ; i++) {
-                fatherIconListAsk.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_ASK,i));
-                fatherIconListAsk.get(i).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-            for(int i=0 ; i < fatherIconListSuggest.size() ; i++) {
-                fatherIconListSuggest.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_SUGGESTION,i));
-                fatherIconListSuggest.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_SUGGESTION));
-            }
 
 
             UpdateInterface mMotherActTask = new UpdateInterface(motherViewList, MySocketManager.SOCKET_MSG.GET_MOTHERACTIVITY , null, save_date.format(THIS_TIME));
@@ -626,6 +589,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             mBabyActTask = new UpdateInterface(babyViewList, MySocketManager.SOCKET_MSG.GET_BABYACTIVITY_DOWN, null , save_date.format(THIS_TIME));
             mBabyActTask.execute((Void) null);
+
+
+            new Thread(new Runnable() { @Override public void run() {
+                try {
+                    UpdateStressData mStressUpdate = new UpdateStressData(getContext(), graphView , stressgraph , loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000) , Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000)) ;
+                    mStressUpdate.execute((Void) null);
+
+                    /*
+                    Thread.sleep(1000 * 20 );  // wait 20 seconds to update stressGraph again
+                    if(running){
+                        mStressUpdate = new UpdateStressData(getContext(), graphView , stressgraph , loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000) , Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000)) ;
+                        mStressUpdate.execute((Void) null);
+                    }
+                    */
+                } catch (Exception e) {
+                    Log.e("stressUpdateThread",e.toString());
+                }
+            }
+            }).start();
 
 
             //textView.setText( Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
@@ -726,7 +708,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onTouch(View v, MotionEvent event) {
                 int NONE = 0;
                 int DRAG = 1;
-                int MAX_MOVE = 150;
+                int MAX_MOVE = 170;
                 int m_mode = NONE;
 
                 final int action = event.getAction();
@@ -734,15 +716,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         m_mode = NONE;
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        boolean error = false;
-
+                        boolean isPossible = false;
+                        if(USER_TYPE == USER_TYPE_ENUM.MOTHER){
+                            for(int i=0 ;i<motherEmotionList.size() ; i++){
+                                if ( ((ViewGroup)motherEmotionList.get(i)).getChildCount() <= 0 ){
+                                    isPossible= true;
+                                    break;
+                                }
+                            }
+                            if(isPossible && boxOwner != ICON_GROUP.MOTHER_EMOTION){
+                                Toast.makeText(getContext(), "'엄마 감정' 란을 모두 채워주세요." ,  Toast.LENGTH_SHORT).show();
+                                break;
+                            }
+                        }
                         if(USER_TYPE == USER_TYPE_ENUM.FATHER &&  (boxOwner == ICON_GROUP.MOTHER_ACTIVITY || boxOwner == ICON_GROUP.MOTHER_EMOTION)) {
                             Toast.makeText(getContext(), "Can't use mother's icon" ,  Toast.LENGTH_SHORT).show();
                             break;
                         }else if (USER_TYPE == USER_TYPE_ENUM.MOTHER &&  (boxOwner == ICON_GROUP.FATHER_ASK || boxOwner == ICON_GROUP.FATHER_COMMENT || boxOwner == ICON_GROUP.FATHER_SUGGESTION) ) {
                             Toast.makeText(getContext(), "Can't use father's icon" ,  Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        if(USER_TYPE == USER_TYPE_ENUM.MOTHER){
+                            isPossible = false;
+                            for(int i=0 ;i<motherEmotionList.size() ; i++){
+                                if ( ((ViewGroup)motherEmotionList.get(i)).getChildCount() <= 0 ){
+                                    isPossible= true;
+                                    break;
+                                }
+                            }
+                            if(isPossible && boxOwner != ICON_GROUP.MOTHER_EMOTION){
+                                break;
+                            }
+                        }
+                        if(USER_TYPE == USER_TYPE_ENUM.FATHER &&  (boxOwner == ICON_GROUP.MOTHER_ACTIVITY || boxOwner == ICON_GROUP.MOTHER_EMOTION)) {
+                            break;
+                        }else if (USER_TYPE == USER_TYPE_ENUM.MOTHER &&  (boxOwner == ICON_GROUP.FATHER_ASK || boxOwner == ICON_GROUP.FATHER_COMMENT || boxOwner == ICON_GROUP.FATHER_SUGGESTION) ) {
                             break;
                         }
 
@@ -870,63 +881,165 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         private final class FatherAlertListener implements View.OnClickListener{
-            Type type;
+            communicationType type;
+            int listid;
+            LinearLayout view;
 
-            public FatherAlertListener(Type _type){
-                type = _type;
+            public FatherAlertListener(LinearLayout _view , communicationType _type, int i){
+                view = _view ;type = _type; listid = i;
             }
 
             public void onClick(View v) {
 
-                    final ImageView tt = (ImageView) v;
+                final ImageView tt = (ImageView) v;
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
 
                 switch(type){
-                        case MOTHER_STRESS:
+                    case MOTHER_STRESS_START:
                             alertDialogBuilder
                                     .setIcon(R.drawable.ic_emotion_lv1)
-                                    .setTitle("Mother is tired")
-                                    .setMessage("Mother looks very stressful. \n\nAsking why she does makes her be happy. \n\n Will you contact her soon?")
+                                    .setTitle("Mother is stressful")
+                                    //.setMessage("Mother looks very stressful. \n\nAsking why she does makes her be happy. \n\n Will you contact her soon?")
+                                    .setMessage("엄마의 기분이 좋지 않은 상태입니다. \n\n 엄마의 기분이 왜 안좋았는지 물어 보는 것이 스트레스 해소에 큰 도움이 됩니다. \n\n 엄마의 기분이 왜 안좋은지 물어 볼 것인가요?")
                                     .setCancelable(false)
-                                    .setPositiveButton("Yes, I will", new DialogInterface.OnClickListener() {
+                                    .setNegativeButton("아니오, 아직입니다", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
-                                            showIcon( tt , Type.FATHER_BEFORE  );  // pass ImageView
+                                            Toast.makeText(getContext(), "배우자를 위해서 관심 가져보는 것을 추천드립니다." ,  Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .setPositiveButton("네", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            view.setOnClickListener(null);
+                                            Toast.makeText(getContext(), "감사합니다." ,  Toast.LENGTH_SHORT).show();
+                                            tt.setOnClickListener(new FatherAlertListener(view,communicationType.FATHER_WAITING,listid));
+                                            view.getChildAt(0).clearAnimation();
+                                            MySocketManager socketM = new MySocketManager(USER_ID);
+                                            socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "SM") ;  // Mother emoticon index is different
                                         }
                                     });
                             break;
 
-                        case FATHER_BEFORE:
-                            alertDialogBuilder
-                                    .setIcon(R.drawable.ic_father_heart)
-                                    .setMessage("Mother is waiting for your attention. \n\nAsking why she does makes her be happy.")
-                                    .setCancelable(false)
-                                    .setPositiveButton("Okay, I will ask", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            showIcon( tt , Type.FATHER_AFTER  );  // pass ImageView
-                                        }
-                                    });
-                            break;
-
-                    case FATHER_AFTER:
+                    case FATHER_WAITING:
                         alertDialogBuilder
-                                .setIcon(R.drawable.ic_father_heart)
-                                .setMessage("Father checked your stressful emotion. \n\n He is wondering and will contact you.")
+                                .setIcon(R.drawable.ic_emotion_lv1)
+                                .setTitle("Mother is stressful")
+                                //.setMessage("Mother looks very stressful. \n\nAsking why she does makes her be happy. \n\n Will you contact her soon?")
+                                .setMessage("엄마가 연락을 기다리고 있습니다. 전화나 문자를 통해서 물어보세요. 바쁘시다면 집에 가서 물어보셔도 좋습니다.")
                                 .setCancelable(false)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        tt.clearAnimation();
                                     }
                                 });
                         break;
-                    }
 
+
+                    case MOTHER_MSG:
+                        alertDialogBuilder
+                                .setIcon(R.drawable.ic_father_heart)
+                                .setMessage("배우자가 당신의 높은 스트레스 지수에 대해서 왜 그런지 궁금해 하고 있습니다. \n\n 배우자에게서 연락을 받으셨나요?")
+                                .setCancelable(false)
+                                .setNegativeButton("아니오, 아직입니다.", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        view.getChildAt(0).clearAnimation();
+                                        MySocketManager socketM = new MySocketManager(USER_ID);
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "SW") ;  // Mother emoticon index is different
+                                    }
+                                })
+                                .setPositiveButton("네, 받았습니다.", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        view.getChildAt(0).clearAnimation();
+                                        view.setOnClickListener(null);
+                                        view.removeView(view.getChildAt(0));
+                                        ImageView addImage = new ImageView(getContext());
+                                        addImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_couple_heart, null));
+                                        view.addView(addImage);
+                                        MySocketManager socketM = new MySocketManager(USER_ID);
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "CO") ;  // Mother emoticon index is different
+                                    }
+                                });
+                        break;
+
+
+                    }
                     AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.show();
 
             }
         }
 
+        private final class MyTableLongListener implements View.OnLongClickListener {
+
+            @Override
+            public boolean onLongClick(View v) {
+                String iconText = null;
+                String piece = null;
+
+                if(res !=null && ((LinearLayout) v).getChildCount() > 0){
+                    piece = getDrawableString(res, ((ImageView) ((LinearLayout) v).getChildAt(0)).getDrawable());
+
+                    if (piece.equals("B1")) {
+                        iconText="'적은양'의 식사를 하였습니다.";
+                    } else if (piece.equals("B2")) {
+                        iconText="'중간양'의 식사를 하였습니다.";
+                    } else if (piece.equals("B3")) {
+                        iconText="'많은양'의 식사를 하였습니다.";
+                    } else if (piece.equals("DI")) {
+                        iconText="기저귀를 갈았습니다.";
+                    } else if (piece.equals("DU")) {
+                        iconText="대변을 보았습니다.";
+                    } else if (piece.equals("SL")) {
+                        iconText="잠을 잤습니다.";
+                    } else if (piece.equals("BA")) {
+                        iconText="목욕을 하였습니다.";
+                    } else if (piece.equals("HO")) {
+                        iconText="아기를 보거나 달래고 있습니다.";
+                    } else if (piece.equals("M1")) {
+                        iconText="'적은양'의 식사를 하였습니다.";
+                    } else if (piece.equals("M2")) {
+                        iconText="'중간양'의 식사를 하였습니다.";
+                    } else if (piece.equals("M3")) {
+                        iconText="'많은양'의 식사를 하였습니다.";
+                    } else if (piece.equals("RE")) {
+                        iconText="휴식 시간입니다.";
+                    } else if (piece.equals("E1")) {
+                        iconText="기분 아주 나쁨";
+                    } else if (piece.equals("E2")) {
+                        iconText="기분 나쁨";
+                    } else if (piece.equals("E3")) {
+                        iconText="기분 보통";
+                    } else if (piece.equals("E4")) {
+                        iconText="기분 좋음";
+                    } else if (piece.equals("E5")) {
+                        iconText="기분 아주 좋음";
+                    } else if (piece.equals("C1")) {
+                        iconText="하트로 답을 하였습니다.";
+                    } else if (piece.equals("C2")) {
+                        iconText="장미꽃으로 답을 하였습니다.";
+                    } else if (piece.equals("C3")) {
+                        iconText="따봉으로 답을 하였습니다.";
+                    } else if (piece.equals("C4")) {
+                        iconText="스마일로 답을 하였습니다.";
+                    } else if (piece.equals("AS")) {
+                        iconText="이때 아기가 뭐했는지 궁금해합니다.";
+                    } else if (piece.equals("S1")) {
+                        iconText="이때 식사를 하면 어떨지 권하고 있습니다.";
+                    } else if (piece.equals("S2")) {
+                        iconText="이때 휴식시간을 가지면 어떨지 권하고 있습니다.";
+                    } else if (piece.equals("WN") && USER_TYPE_ENUM.FATHER == USER_TYPE) {
+
+                    } else if (piece.equals("SM")) {
+
+                    } else if (piece.equals("SW")) {
+
+                    } else if (piece.equals("CO")) {
+                        iconText="엄마의 스트레스 받는 일에 대하여 공유하였습니다.";
+                    }
+                    Toast.makeText(getContext(), iconText ,  Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }
+        }
 
         private final class MyTableClearListener implements View.OnClickListener{
 
@@ -938,8 +1051,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 array_id = _id;
             }
 
-
             public void onClick(final View v) {
+
+                if(boxOwner == MOTHER && USER_TYPE == USER_TYPE_ENUM.FATHER){
+                    return ;
+                }
+                if(boxOwner == MOTHER_EMOTION && USER_TYPE == USER_TYPE_ENUM.FATHER){
+                    return ;
+                }
+                if(boxOwner == FATHER_COMMENT && USER_TYPE == USER_TYPE_ENUM.MOTHER){
+                    return;
+                }
+
                     final LinearLayout container = (LinearLayout) v;
                     if (((ViewGroup) container).getChildCount() > 0) {
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
@@ -986,41 +1109,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         alertDialog.show();
                     }
                 }
-        }
-
-        public void showIcon(View parent, Type a){
-            switch(a){
-                case MOTHER_STRESS:  // Pass LinearLayout
-                    LinearLayout parent_view = (LinearLayout) parent;
-                    ImageView addImage = new ImageView(getContext());
-                    addImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_warning, null)  );
-                    AlphaAnimation blinkanimation= new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
-                    blinkanimation.setDuration(800); // duration
-                    blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
-                    blinkanimation.setRepeatCount(-1); // Repeat animation infinitely
-                    blinkanimation.setRepeatMode(Animation.REVERSE);
-                    addImage.startAnimation(blinkanimation);
-                    addImage.setOnClickListener(new FatherAlertListener(Type.MOTHER_STRESS));
-                    parent_view.addView(addImage);
-                break;
-
-                case FATHER_BEFORE:   // Pass ImageView
-                    ((ImageView)parent).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sms, null));
-                    parent.setOnClickListener(new FatherAlertListener(Type.FATHER_BEFORE));
-                    parent.clearAnimation();
-                    break;
-
-                case FATHER_AFTER:
-                    ((ImageView)parent).setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sms, null));
-                    AlphaAnimation blinkanimation2= new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
-                    blinkanimation2.setDuration(800); // duration
-                    blinkanimation2.setInterpolator(new LinearInterpolator()); // do not alter animation rate
-                    blinkanimation2.setRepeatCount(-1); // Repeat animation infinitely
-                    blinkanimation2.setRepeatMode(Animation.REVERSE);
-                    parent.startAnimation(blinkanimation2);
-                    parent.setOnClickListener(new FatherAlertListener(Type.FATHER_AFTER));
-                    break;
-            }
         }
 
         class MyDragListener implements View.OnDragListener {
@@ -1095,16 +1183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             // if( newView.getDrawable().getAlpha() < 255){
                             // 253 - very bad , 254 - bad
 
-                            // Mother emotion view list's index is different
-                            if( getDrawableString( getResources()  ,newView.getDrawable()).compareTo("E1") == 0 || getDrawableString( getResources()  ,newView.getDrawable()).compareTo("E2") == 0 ){
-                                if(((ViewGroup)fatherViewListTemp.get(v.getLabelFor())).getChildCount() > 0){
-                                    ((ViewGroup)fatherViewListTemp.get(v.getLabelFor())).removeAllViews();
-                                }
-                                showIcon(((ViewGroup)fatherViewListTemp.get(v.getLabelFor())), Type.MOTHER_STRESS  );
-                            }
-
                             String save_icon_string = getDrawableString( getResources()  ,newView.getDrawable());
-
                             switch(boxOwner){
                                 case BABY:
                                     socketM = new MySocketManager(USER_ID);
@@ -1119,6 +1198,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHERACTIVITY, save_date.format(THIS_TIME) , id , save_icon_string) ;
                                     break;
                                 case MOTHER_EMOTION:
+                                    // When mother is stressful
+                                    if( getDrawableString( getResources()  ,newView.getDrawable()).compareTo("E1") == 0 || getDrawableString( getResources()  ,newView.getDrawable()).compareTo("E2") == 0 ){
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , v.getLabelFor() , "WN") ;  // Mother emoticon index is different
+                                    }
+
                                     socketM = new MySocketManager(USER_ID);
                                     socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHEREMOTION, save_date.format(THIS_TIME) , v.getLabelFor() , save_icon_string) ;  // Mother emoticon index is different
                                     break;
@@ -1129,8 +1213,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT, save_date.format(THIS_TIME) , v.getLabelFor() , save_icon_string) ;
                                     break;
                             }
-
-
                         }
                         break;
 
@@ -1147,7 +1229,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         View originalview = (View) event.getLocalState();
                         ImageView oldImage = (ImageView) originalview;
                         oldImage.setVisibility(ImageView.VISIBLE);
-
                     default:
                         break;
                 }
@@ -1171,7 +1252,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_bath, null), b)){
                 return "B1";
             }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_motherhood, null), b)){
-                return "H0";
+                return "HO";
             }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_rise_s, null), b)){
                 return "M1";
             }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_rise_m, null), b)){
@@ -1204,6 +1285,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return "S1";
             }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_rest_sug, null), b)){
                 return "S2";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_father_warning, null), b)){
+                return "WN";
+            } else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_sms, null), b)){
+                return "SM";
+            }else if (areDrawablesIdentical(ResourcesCompat.getDrawable(a, R.drawable.ic_couple_heart, null), b)){
+                return "CO";
             }
             return "NULL";
         }
@@ -1245,13 +1332,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             String start;
             String end;
             int thres = 50;
+            Context context;
 
-            UpdateStressData(RelativeLayout _graphView , GraphView _stressgraph , ProgressBar _loading , String _start , String _end) {
+            UpdateStressData(Context _context, RelativeLayout _graphView , GraphView _stressgraph , ProgressBar _loading , String _start , String _end) {
                 graphView = _graphView;
                 stressgraph = _stressgraph;
                 loading = _loading;
                 start = _start;
                 end = _end;
+                context = _context;
             }
 
             @Override
@@ -1260,11 +1349,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     MyOAuthConnect a = new MyOAuthConnect(save_date.format(THIS_TIME));
                     values = a.sendGet(start , end);
 
-                    MySocketManager socketM = new MySocketManager(USER_ID);
-                    thres = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_THRESHOLD , save_date.format(THIS_TIME)));
+                    //MySocketManager socketM = new MySocketManager(USER_ID);
+                    //thres = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_THRESHOLD , save_date.format(THIS_TIME)));
 
                 } catch (Exception e) {
-                    Log.e("Exception",e.toString());
+                    Log.e("doInBackground",e.toString());
                 }
                 return false;
             }
@@ -1272,28 +1361,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             protected void onPostExecute(Boolean success) {
                 // LOAD MOTHER STRESS VALUE
-                graphView.removeView(stressgraph);
-                stressgraph = new GraphView(getContext() , values, "", null , verlabels, thres);
-                stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT , 250 ));
-                graphView.addView(stressgraph);
-                loading.setVisibility(ProgressBar.GONE);
+                if(running) {
 
-                // SET MOTHERS STRESS BOX
-                List<Boolean> stressfulBox = findStressfullBox();
-                for(int i=0 ; i<stressfulBox.size() ; i++){
-                    if(stressfulBox.get(i) == true){
-                        motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape, null));
-                        motherEmotionList.add(motherEmotionListTemp.get(i));
-                        motherEmotionList.get(motherEmotionList.size()-1).setLabelFor(i); // just added value
+                    if(context != null && context.getResources()!=null) {
+                        graphView.removeView(stressgraph);
+                        stressgraph = new GraphView(context, values, "", null, verlabels, thres);
+                        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+                        int width = dm.widthPixels;
+                        int height = dm.heightPixels;
+                        stressgraph.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, height / 9));
+                        graphView.addView(stressgraph);
+                        loading.setVisibility(ProgressBar.GONE);
+
+                        // SET MOTHERS STRESS BOX
+                        List<Boolean> stressfulBox = findStressfullBox();
+                        for (int i = 0; i < stressfulBox.size(); i++) {
+                            if (stressfulBox.get(i) == true) {
+                                motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape, null));
+                                motherEmotionList.add(motherEmotionListTemp.get(i));
+                                motherEmotionList.get(motherEmotionList.size() - 1).setLabelFor(i); // just added value
+                            } else
+                                motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_impossible, null));
+                        }
+
+                        for (int i = 0; i < motherEmotionList.size(); i++) {
+                            motherEmotionList.get(i).setOnDragListener(new MyDragListener(MOTHER_EMOTION, i));
+                            motherEmotionList.get(i).setOnClickListener(new MyTableClearListener(MOTHER_EMOTION, i));
+                            motherEmotionList.get(i).setOnLongClickListener(new MyTableLongListener());
+                            //motherEmotionList.get(i).setLabelFor(i);  // already setup before
+                        }
                     }
-                    else
-                        motherEmotionListTemp.get(i).setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.shape_impossible, null));
-                }
-
-                for(int i=0 ; i < motherEmotionList.size() ; i++){
-                    motherEmotionList.get(i).setOnDragListener(new MyDragListener(MOTHER_EMOTION, i));
-                    motherEmotionList.get(i).setOnClickListener(new MyTableClearListener(MOTHER_EMOTION, i));
-                    //motherEmotionList.get(i).setLabelFor(i);  // already setup before
                 }
             }
         }
@@ -1334,78 +1431,219 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             protected void onPostExecute(final Boolean success) {
                 // B1 DI DU SL BA HO
                 // M1 RE E1 C1 AS S1
-
-                if(data==null){
-                    Log.e("onPostExecute", msg.toString());
-                    Log.e("onPostExecute", data);
-                }
-
-                String[] pieces = data.split(" ");
-
-                for(int i=0 ; i < pieces.length ; i++){
-                    Drawable icon=null;
-                    if( pieces[i].equals("B1")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_small, null);
-                    } else if ( pieces[i].equals("B2")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_medium, null);
-                    }else if ( pieces[i].equals("B3")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_large, null);
-                    }else if ( pieces[i].equals("DI")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.diaper_pee, null);
-                    }else if ( pieces[i].equals("DU")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baby_poop, null);
-                    }else if ( pieces[i].equals("SL")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sleeping_baby, null);
-                    }else if ( pieces[i].equals("BA")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bath, null);
-                    }else if ( pieces[i].equals("HO")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_motherhood, null);
-                    }else if ( pieces[i].equals("M1")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_s, null);
-                    }else if ( pieces[i].equals("M2")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_m, null);
-                    }else if ( pieces[i].equals("M3")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_l, null);
-                    }else if ( pieces[i].equals("RE")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rest, null);
-                    }else if ( pieces[i].equals("E1")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv1, null);
-                    }else if ( pieces[i].equals("E2")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv2, null);
-                    }else if ( pieces[i].equals("E3")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv3, null);
-                    }else if ( pieces[i].equals("E4")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv4, null);
-                    }else if ( pieces[i].equals("E5")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv5, null);
-                    }else if ( pieces[i].equals("C1")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_heart, null);
-                    }else if ( pieces[i].equals("C2")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rose, null);
-                    }else if ( pieces[i].equals("C3")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_thumsup, null);
-                    }else if ( pieces[i].equals("C4")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_smile, null);
-                    }else if ( pieces[i].equals("AS")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_ask, null);
-                    }else if ( pieces[i].equals("S1")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rise_sug, null);
-                    }else if ( pieces[i].equals("S2")){
-                        icon =ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rest_sug, null);
+                if(running) {
+                    if (data == null) {
+                        Log.e("onPostExecute", msg.toString());
+                        Log.e("onPostExecute", data);
                     }
 
-                    if(icon !=null) {
-                        ImageView addImage = new ImageView(getContext());
-                        addImage.setImageDrawable(icon);
-                        ((LinearLayout)viewList.get(i)).addView(addImage);
+                    for(int i=0 ; i <  babyIconList.size() ; i++){
+                        babyIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.BABY_ACTIVITY , i));
+                        if(i==0)
+                            babyIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.BABY_FEED));
+                        else {
+                            babyIconList.get(i).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다." ,  Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+
+                    for(int i=0 ; i < motherIconList.size() ; i++){
+                        motherIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.MOTHER_ACTIVITY,i));
+                        if(i==0)
+                            motherIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.MOTHER_FOOD));
+                        else {
+                            motherIconList.get(i).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+
+                    for(int i=0 ; i < motherEmotionIconList.size() ; i++){
+                        motherEmotionIconList.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.MOTHER_EMOTION,i));
+                        if(i==0)
+                            motherEmotionIconList.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.MOTHER_EMOTION));
+                        else {
+                            motherEmotionIconList.get(i).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                    for(int i=0 ; i < fatherIconListComment.size() ; i++) {
+                        fatherIconListComment.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_COMMENT,i));
+                        fatherIconListComment.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_COMMENT));
+                    }
+                    for(int i=0 ; i < fatherIconListAsk.size() ; i++) {
+                        fatherIconListAsk.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_ASK,i));
+                        fatherIconListAsk.get(i).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Toast.makeText(getContext(), "변경 가능한 아이콘이 없습니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    for(int i=0 ; i < fatherIconListSuggest.size() ; i++) {
+                        fatherIconListSuggest.get(i).setOnTouchListener(new MyIconTouchClickListener(ICON_GROUP.FATHER_SUGGESTION,i));
+                        fatherIconListSuggest.get(i).setOnClickListener(new MyIconCustomDialog(CustomDialogIcon.Type.FATHER_SUGGESTION));
+                    }
+
+                    String[] pieces = data.split(" ");
+
+                    for (int i = 0; i < pieces.length; i++) {
+                        Drawable icon = null;
+
+                        boolean warning_icon = false;
+                        boolean sms_icon = false;
+                        String iconText ="";
+                        if (pieces[i].equals("B1")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_small, null);
+                            iconText="'적은양'의 식사를 하였습니다.";
+                        } else if (pieces[i].equals("B2")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_medium, null);
+                            iconText="'중간양'의 식사를 하였습니다.";
+                        } else if (pieces[i].equals("B3")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_food_large, null);
+                            iconText="'많은양'의 식사를 하였습니다.";
+                        } else if (pieces[i].equals("DI")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.diaper_pee, null);
+                            iconText="기저귀를 갈았습니다.";
+                        } else if (pieces[i].equals("DU")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baby_poop, null);
+                            iconText="대변을 보았습니다.";
+                        } else if (pieces[i].equals("SL")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sleeping_baby, null);
+                            iconText="잠을 잤습니다.";
+                        } else if (pieces[i].equals("BA")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_bath, null);
+                            iconText="목욕을 하였습니다.";
+                        } else if (pieces[i].equals("HO")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_motherhood, null);
+                            iconText="아기를 보거나 달래고 있습니다.";
+                        } else if (pieces[i].equals("M1")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_s, null);
+                            iconText="'적은양'의 식사를 하였습니다.";
+                        } else if (pieces[i].equals("M2")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_m, null);
+                            iconText="'중간양'의 식사를 하였습니다.";
+                        } else if (pieces[i].equals("M3")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rise_l, null);
+                            iconText="'많은양'의 식사를 하였습니다.";
+                        } else if (pieces[i].equals("RE")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_rest, null);
+                            iconText="휴식 시간입니다.";
+                        } else if (pieces[i].equals("E1")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv1, null);
+                            iconText="기분 아주 나쁨";
+                        } else if (pieces[i].equals("E2")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv2, null);
+                            iconText="기분 나쁨";
+                        } else if (pieces[i].equals("E3")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv3, null);
+                            iconText="기분 보통";
+                        } else if (pieces[i].equals("E4")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv4, null);
+                            iconText="기분 좋음";
+                        } else if (pieces[i].equals("E5")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_emotion_lv5, null);
+                            iconText="기분 아주 좋음";
+                        } else if (pieces[i].equals("C1")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_heart, null);
+                            iconText="하트로 답을 하였습니다.";
+                        } else if (pieces[i].equals("C2")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rose, null);
+                            iconText="장미꽃으로 답을 하였습니다.";
+                        } else if (pieces[i].equals("C3")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_thumsup, null);
+                            iconText="따봉으로 답을 하였습니다.";
+                        } else if (pieces[i].equals("C4")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_smile, null);
+                            iconText="스마일로 답을 하였습니다.";
+                        } else if (pieces[i].equals("AS")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_ask, null);
+                            iconText="이때 아기가 뭐했는지 궁금해합니다.";
+                        } else if (pieces[i].equals("S1")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rise_sug, null);
+                            iconText="이때 식사를 하면 어떨지 권하고 있습니다.";
+                        } else if (pieces[i].equals("S2")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_rest_sug, null);
+                            iconText="이때 휴식시간을 가지면 어떨지 권하고 있습니다.";
+                        } else if (pieces[i].equals("WN") && USER_TYPE_ENUM.FATHER == USER_TYPE) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_warning, null);
+                            warning_icon = true;
+                        } else if (pieces[i].equals("SM")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sms, null);
+                            sms_icon = true;
+                        } else if (pieces[i].equals("SW")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sms, null);
+                            sms_icon = true;
+                        } else if (pieces[i].equals("CO")) {
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_couple_heart, null);
+                            iconText="엄마의 스트레스 받는 일에 대하여 공유하였습니다.";
+                        }
+
+                        final String iconText2 = iconText;
+
+                        if (icon != null) {
+                            ImageView addImage = new ImageView(getContext());
+                            if (warning_icon) {
+                                AlphaAnimation blinkanimation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+                                blinkanimation.setDuration(800); // duration
+                                blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+                                blinkanimation.setRepeatCount(-1); // Repeat animation infinitely
+                                blinkanimation.setRepeatMode(Animation.REVERSE);
+                                addImage.setImageDrawable(icon);
+                                addImage.startAnimation(blinkanimation);
+                                addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.MOTHER_STRESS_START, i));
+                                ((LinearLayout) viewList.get(i)).addView(addImage);
+                                ((LinearLayout) viewList.get(i)).setOnClickListener(null);
+                            } else if (sms_icon) {
+                                if (USER_TYPE == USER_TYPE_ENUM.FATHER) {
+                                    icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_warning, null);
+                                    addImage.setImageDrawable(icon);
+                                    addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.FATHER_WAITING, i));
+                                    ((LinearLayout) viewList.get(i)).addView(addImage);
+                                    ((LinearLayout) viewList.get(i)).setOnClickListener(null);
+                                } else {
+                                    AlphaAnimation blinkanimation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+                                    blinkanimation.setDuration(800); // duration
+                                    blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+                                    blinkanimation.setRepeatCount(-1); // Repeat animation infinitely
+                                    blinkanimation.setRepeatMode(Animation.REVERSE);
+                                    addImage.setImageDrawable(icon);
+
+                                    //if( pieces[i].equals("SM"))
+                                    addImage.startAnimation(blinkanimation);
+                                    addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.MOTHER_MSG, i));
+                                    ((LinearLayout) viewList.get(i)).addView(addImage);
+                                    ((LinearLayout) viewList.get(i)).setOnClickListener(null);
+                                }
+                            } else {
+                                /*
+                                addImage.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Toast.makeText(getContext(), iconText2 ,  Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                */
+                                addImage.setImageDrawable(icon);
+                                ((LinearLayout) viewList.get(i)).addView(addImage);
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
-
-
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

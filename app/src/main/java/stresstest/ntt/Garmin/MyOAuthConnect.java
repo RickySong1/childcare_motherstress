@@ -36,6 +36,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 
+import stresstest.ntt.kaist.childcare.MainActivity;
 import stresstest.ntt.mymanager.MyFileManager;
 import stresstest.ntt.mymanager.MySocketManager;
 
@@ -50,12 +51,36 @@ public class MyOAuthConnect {
     final String Consumer_Key ="fef35759-89eb-4915-acf4-4a991c0414d6";
     final String Consumer_Secret = "BzhUGDBRCmo8IpDMxzPB80AgSDteJFOnSkw";
 
-    final String User_Token = "500c5606-46cc-4ffb-a436-1ad508d42cf0";
-    final String User_Secret = "Vi9YHR99yUVvxdqe03CDIayVo3S4axhDIJV";
+    String User_Token = "500c5606-46cc-4ffb-a436-1ad508d42cf0"; // Mine
+    String User_Secret = "Vi9YHR99yUVvxdqe03CDIayVo3S4axhDIJV"; // Mine
 
     String this_date;
-
     public MyOAuthConnect(String _this ) throws Exception {
+        if( MainActivity.USER_ID.split("_")[0].equals("USER01")==true){
+            User_Token = "17d307ca-c3c3-406c-b29f-a03030ee9c01";
+            User_Secret = "Rgpwi2WcEHgelQTSFEb7OPorkUBS0KpVSLx";
+        }else if( MainActivity.USER_ID.split("_")[0].equals("USER02")==true){
+            User_Token = "f6c74606-9a4c-461e-804f-f2cc324ff4bc";
+            User_Secret = "FFMFW5C21xFqqpczeWfQfmrmfiKkHzImFh3";
+        }else if( MainActivity.USER_ID.split("_")[0].equals("USER03")==true){
+            User_Token = "f6bdd9f2-faa1-421b-93f2-07d7a74707a3";
+            User_Secret = "df8Jc9m1GCPqYQSee4uq2pkbYueICRZoXlR";
+        }else if( MainActivity.USER_ID.split("_")[0].equals("USER04")==true){
+
+        }else if( MainActivity.USER_ID.split("_")[0].equals("USER05")==true){
+
+        }else if( MainActivity.USER_ID.split("_")[0].equals("USER06")==true){
+
+        }else if( MainActivity.USER_ID.split("_")[0].equals("USER07")==true){
+
+        }else if( MainActivity.USER_ID.split("_")[0].equals("USER08")==true){
+
+        }else if( MainActivity.USER_ID.split("_")[0].equals("USER09")==true){
+
+        }else if( MainActivity.USER_ID.split("_")[0].equals("TEST01")==true){
+            User_Token = "500c5606-46cc-4ffb-a436-1ad508d42cf0";
+            User_Secret = "Vi9YHR99yUVvxdqe03CDIayVo3S4axhDIJV";
+        }
 
         this_date = _this;
         /*

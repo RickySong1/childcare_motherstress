@@ -12,7 +12,6 @@
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <TextView
             android:textStyle="bold"
             android:id="@+id/text_date"
@@ -20,9 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:textColor="#cacaca"
-            android:layout_margin="5dp"
-            />
-
+            android:layout_margin="5dp" />
         <TextView
             android:textStyle="bold"
             android:text="[엄마 스트레스 지수]"
@@ -801,15 +798,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             app:srcCompat="@drawable/ic_food_small"/>
-
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-
                             android:layout_alignRight="@id/activity_btn_t1"
                             android:layout_alignTop="@id/activity_btn_t1"
                             android:gravity="top"
-
                             android:paddingLeft="1dp"
                             android:text="↺"
                             android:textColor="#ff0000"
@@ -817,7 +811,6 @@
                             android:textStyle="bold"
                             android:typeface="sans" />
                     </RelativeLayout>
-
                         <ImageView
                             android:padding="2dp"
                             android:id="@+id/activity_btn_t2"
@@ -825,7 +818,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             app:srcCompat="@drawable/diaper_pee"/>
-
                     <ImageView
                         android:padding="2dp"
                         android:id="@+id/activity_btn_t3"

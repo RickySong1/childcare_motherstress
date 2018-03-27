@@ -52,18 +52,16 @@ public class LoginSettingActivity extends AppCompatActivity  {
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            //
             "111:TEST01_FATHER", "222:TEST01_MOTHER",
-            "kimm:USER01_FATHER", "kimf@example.com:USER01_MOTHER",
-            "foo@example.com:USER02_FATHER", "bar@example.com:USER02_MOTHER",
-            "foo@example.com:USER03_FATHER", "bar@example.com:USER03_MOTHER",
-            "foo@example.com:USER04_FATHER", "bar@example.com:USER04_MOTHER",
-            "foo@example.com:USER05_FATHER", "bar@example.com:USER05_MOTHER",
-            "foo@example.com:USER06_FATHER", "bar@example.com:USER06_MOTHER",
-            "foo@example.com:USER07_FATHER", "bar@example.com:USER07_MOTHER",
-            "foo@example.com:USER08_FATHER", "bar@example.com:USER08_MOTHER",
-            "foo@example.com:USER09_FATHER", "bar@example.com:USER09_MOTHER",
-            "foo@example.com:USER10_FATHER", "bar@example.com:USER10_MOTHER",
+            "11:USER01_FATHER", "12:USER01_MOTHER",
+            "21:USER02_FATHER", "22:USER02_MOTHER",
+            "31:USER03_FATHER", "32:USER03_MOTHER",
+            "41:USER04_FATHER", "42:USER04_MOTHER",
+            "51:USER05_FATHER", "52:USER05_MOTHER",
+            "61:USER06_FATHER", "62:USER06_MOTHER",
+            "71:USER07_FATHER", "72:USER07_MOTHER",
+            "81:USER08_FATHER", "82:USER08_MOTHER",
+            "91:USER09_FATHER", "92:USER09_MOTHER",
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.

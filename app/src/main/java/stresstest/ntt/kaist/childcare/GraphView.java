@@ -16,8 +16,7 @@ import android.widget.TableRow;
  */
 public class GraphView extends View {
 
-    public static int HIGH_STRESS_SCORE = 50;
-
+    public static int HIGH_STRESS_SCORE = 60;
     public static boolean BAR = true;
     public static boolean LINE = false;
     private Paint paint;
@@ -25,10 +24,8 @@ public class GraphView extends View {
     private String[] horlabels;
     private String[] verlabels;
     private String title;
-
-
-
     private boolean type;
+
     public GraphView(Context context, int [] values, String title, String[] horlabels, String[] verlabels , int threshold) {
         super(context);
 
