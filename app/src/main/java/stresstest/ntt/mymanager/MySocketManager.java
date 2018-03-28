@@ -58,7 +58,7 @@ public class MySocketManager {
 
     public enum SOCKET_MSG {
         GET_PAGE_COUNT ,  GET_FATHERCOMMENT , GET_MOTHERACTIVITY, GET_MOTHEREMOTION, GET_BABYACTIVITY_UP, GET_BABYACTIVITY_DOWN, GET_THRESHOLD,
-        SET_OPENAPP , SET_FATHERCOMMENT , SET_MOTHERACTIVITY, SET_MOTHEREMOTION, SET_BABYACTIVITY_UP, SET_BABYACTIVITY_DOWN, SET_STRESS_DATA
+        SET_OPENAPP , SET_FATHERCOMMENT , SET_MOTHERACTIVITY, SET_MOTHEREMOTION, SET_BABYACTIVITY_UP, SET_BABYACTIVITY_DOWN, SET_STRESS_DATA, SET_FATHER_FCM_TOKEN
     }
 
     public MySocketManager(String _userType) {
@@ -99,6 +99,10 @@ public class MySocketManager {
                         break;
                     case SET_STRESS_DATA:
                         send_message = pre_message+"SET_STRESS_DATA##"+_target_time+"##"+"0"+"##"+save_string+"##";
+                        break;
+
+                    case SET_FATHER_FCM_TOKEN:
+                        send_message = pre_message+"SET_FATHER_FCM_TOKEN##"+"0"+"##"+"0"+"##"+save_string+"##";
                         break;
                 }
 
@@ -186,11 +190,6 @@ public class MySocketManager {
 
         return get_message;
     }
-
-
-
-
-
 
     public String getTcpIpResult(String userType, String childID , int get_target_data){
         String send_message = null;

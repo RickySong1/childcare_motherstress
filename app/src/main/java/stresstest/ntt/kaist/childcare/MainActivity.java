@@ -116,7 +116,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public enum communicationType {
-        MOTHER_STRESS_START, FATHER_WAITING, MOTHER_MSG
+        MOTHER_STRESS_START,
+        FATHER_WAITING,
+        MOTHER_CHECKED,
+        MOTHER_MSG
     }
 
     @Override
@@ -148,10 +151,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Start Garmin application to initiate Sync.
         Intent garminintent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
-        if(garminintent != null) {
-            MainActivity.this.startActivity(garminintent);
-        }else{
-            Toast.makeText(getApplicationContext(), "GARMIN Connector를 설치해주세요." ,  Toast.LENGTH_SHORT).show();
+        if ( USER_TYPE == USER_TYPE_ENUM.MOTHER ){
+            if(garminintent != null) {
+                MainActivity.this.startActivity(garminintent);
+            }else{
+                Toast.makeText(getApplicationContext(), "GARMIN Connector를 설치해주세요." ,  Toast.LENGTH_SHORT).show();
+            }
         }
 
         // Also start my application running on the background.
@@ -609,7 +614,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             }).start();
 
-
             //textView.setText( Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
         }
@@ -903,11 +907,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     //.setMessage("Mother looks very stressful. \n\nAsking why she does makes her be happy. \n\n Will you contact her soon?")
                                     .setMessage("엄마의 기분이 좋지 않은 상태입니다. \n\n 엄마의 기분이 왜 안좋았는지 물어 보는 것이 스트레스 해소에 큰 도움이 됩니다. \n\n 엄마의 기분이 왜 안좋은지 물어 볼 것인가요?")
                                     .setCancelable(false)
-                                    .setNegativeButton("아니오, 아직입니다", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            Toast.makeText(getContext(), "배우자를 위해서 관심 가져보는 것을 추천드립니다." ,  Toast.LENGTH_SHORT).show();
-                                        }
-                                    })
                                     .setPositiveButton("네", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             view.setOnClickListener(null);
@@ -915,7 +914,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             tt.setOnClickListener(new FatherAlertListener(view,communicationType.FATHER_WAITING,listid));
                                             view.getChildAt(0).clearAnimation();
                                             MySocketManager socketM = new MySocketManager(USER_ID);
-                                            socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "SM") ;  // Mother emoticon index is different
+                                            socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "MC") ;  // Mother emoticon index is different
                                         }
                                     });
                             break;
@@ -925,28 +924,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 .setIcon(R.drawable.ic_emotion_lv1)
                                 .setTitle("Mother is stressful")
                                 //.setMessage("Mother looks very stressful. \n\nAsking why she does makes her be happy. \n\n Will you contact her soon?")
-                                .setMessage("엄마가 연락을 기다리고 있습니다. 전화나 문자를 통해서 물어보세요. 바쁘시다면 집에 가서 물어보셔도 좋습니다.")
+                                .setMessage("엄마가 왜 기분이 안좋았는지 이야기를 해 보셨나요?")
                                 .setCancelable(false)
-                                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                .setNegativeButton("아니오.", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                    }
-                                });
-                        break;
-
-
-                    case MOTHER_MSG:
-                        alertDialogBuilder
-                                .setIcon(R.drawable.ic_father_heart)
-                                .setMessage("배우자가 당신의 높은 스트레스 지수에 대해서 왜 그런지 궁금해 하고 있습니다. \n\n 배우자에게서 연락을 받으셨나요?")
-                                .setCancelable(false)
-                                .setNegativeButton("아니오, 아직입니다.", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        view.getChildAt(0).clearAnimation();
-                                        MySocketManager socketM = new MySocketManager(USER_ID);
-                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "SW") ;  // Mother emoticon index is different
+                                        Toast.makeText(getContext(), "엄마에게는 작은 관심이 스트레스를 줄이는데 큰 도움이 됩니다." ,  Toast.LENGTH_SHORT).show();
                                     }
                                 })
-                                .setPositiveButton("네, 받았습니다.", new DialogInterface.OnClickListener() {
+                                .setPositiveButton("예", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         view.getChildAt(0).clearAnimation();
                                         view.setOnClickListener(null);
@@ -955,7 +940,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         addImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_couple_heart, null));
                                         view.addView(addImage);
                                         MySocketManager socketM = new MySocketManager(USER_ID);
-                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "CO") ;  // Mother emoticon index is different
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "CO") ;
+                                    }
+                                });
+                        break;
+
+                    case MOTHER_CHECKED:
+                        alertDialogBuilder
+                                .setIcon(R.drawable.ic_father_heart)
+                                //.setMessage("Mother looks very stressful. \n\nAsking why she does makes her be happy. \n\n Will you contact her soon?")
+                                .setMessage("아빠가 곧 연락하기로 하였습니다.")
+                                .setCancelable(false)
+                                .setPositiveButton("예", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        view.getChildAt(0).clearAnimation();
+                                        MySocketManager socketM = new MySocketManager(USER_ID);
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "SW") ;
+                                    }
+                                });
+                        break;
+
+                    case MOTHER_MSG:
+                        alertDialogBuilder
+                                .setIcon(R.drawable.ic_father_heart)
+                                .setMessage("아빠랑 왜 기분이 안좋았는지 이야기를 하셨나요?")
+                                .setCancelable(false)
+                                .setNegativeButton("아니오, 아직입니다.", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        view.getChildAt(0).clearAnimation();
+                                        MySocketManager socketM = new MySocketManager(USER_ID);
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "SW") ;
+                                    }
+                                })
+                                .setPositiveButton("네, 이야기 하였습니다.", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        view.getChildAt(0).clearAnimation();
+                                        view.setOnClickListener(null);
+                                        view.removeView(view.getChildAt(0));
+                                        ImageView addImage = new ImageView(getContext());
+                                        addImage.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_couple_heart, null));
+                                        view.addView(addImage);
+                                        MySocketManager socketM = new MySocketManager(USER_ID);
+                                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , listid , "CO") ;
                                     }
                                 });
                         break;
@@ -1579,13 +1605,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         } else if (pieces[i].equals("WN") && USER_TYPE_ENUM.FATHER == USER_TYPE) {
                             icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_warning, null);
                             warning_icon = true;
-                        } else if (pieces[i].equals("SM")) {
+                        } else if (pieces[i].equals("SM")) {  // BLINKING
                             icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sms, null);
                             sms_icon = true;
-                        } else if (pieces[i].equals("SW")) {
+                        } else if (pieces[i].equals("SW")) { //
+                            icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_warning, null);
+                            sms_icon = true;
+                        } else if (pieces[1].equals("MC")){
                             icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sms, null);
                             sms_icon = true;
-                        } else if (pieces[i].equals("CO")) {
+                        } if (pieces[i].equals("CO")) {
                             icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_couple_heart, null);
                             iconText="엄마의 스트레스 받는 일에 대하여 공유하였습니다.";
                         }
@@ -1612,19 +1641,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.FATHER_WAITING, i));
                                     ((LinearLayout) viewList.get(i)).addView(addImage);
                                     ((LinearLayout) viewList.get(i)).setOnClickListener(null);
-                                } else {
-                                    AlphaAnimation blinkanimation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
-                                    blinkanimation.setDuration(800); // duration
-                                    blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
-                                    blinkanimation.setRepeatCount(-1); // Repeat animation infinitely
-                                    blinkanimation.setRepeatMode(Animation.REVERSE);
-                                    addImage.setImageDrawable(icon);
+                                } else { // MOTHER
 
-                                    //if( pieces[i].equals("SM"))
-                                    addImage.startAnimation(blinkanimation);
-                                    addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.MOTHER_MSG, i));
-                                    ((LinearLayout) viewList.get(i)).addView(addImage);
-                                    ((LinearLayout) viewList.get(i)).setOnClickListener(null);
+                                    if(pieces[1].equals("MC")){
+                                        AlphaAnimation blinkanimation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+                                        blinkanimation.setDuration(800); // duration
+                                        blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+                                        blinkanimation.setRepeatCount(-1); // Repeat animation infinitely
+                                        blinkanimation.setRepeatMode(Animation.REVERSE);
+                                        addImage.setImageDrawable(icon);
+                                        //if( pieces[i].equals("SM"))
+                                        addImage.startAnimation(blinkanimation);
+                                        addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.MOTHER_CHECKED, i));
+                                        ((LinearLayout) viewList.get(i)).addView(addImage);
+                                        ((LinearLayout) viewList.get(i)).setOnClickListener(null);
+
+                                    }else {
+                                        AlphaAnimation blinkanimation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+                                        blinkanimation.setDuration(800); // duration
+                                        blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+                                        blinkanimation.setRepeatCount(-1); // Repeat animation infinitely
+                                        blinkanimation.setRepeatMode(Animation.REVERSE);
+                                        addImage.setImageDrawable(icon);
+                                        //if( pieces[i].equals("SM"))
+                                        addImage.startAnimation(blinkanimation);
+                                        addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.MOTHER_MSG, i));
+                                        ((LinearLayout) viewList.get(i)).addView(addImage);
+                                        ((LinearLayout) viewList.get(i)).setOnClickListener(null);
+                                    }
                                 }
                             } else {
                                 /*

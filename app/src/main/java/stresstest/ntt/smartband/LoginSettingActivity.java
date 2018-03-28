@@ -23,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,12 +34,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import stresstest.ntt.kaist.childcare.MainActivity;
 import stresstest.ntt.kaist.childcare.R;
 import stresstest.ntt.mymanager.MyFileManager;
+import stresstest.ntt.mymanager.MySocketManager;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -53,15 +57,17 @@ public class LoginSettingActivity extends AppCompatActivity  {
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "111:TEST01_FATHER", "222:TEST01_MOTHER",
-            "11:USER01_FATHER", "12:USER01_MOTHER",
-            "21:USER02_FATHER", "22:USER02_MOTHER",
-            "31:USER03_FATHER", "32:USER03_MOTHER",
-            "41:USER04_FATHER", "42:USER04_MOTHER",
-            "51:USER05_FATHER", "52:USER05_MOTHER",
-            "61:USER06_FATHER", "62:USER06_MOTHER",
-            "71:USER07_FATHER", "72:USER07_MOTHER",
-            "81:USER08_FATHER", "82:USER08_MOTHER",
-            "91:USER09_FATHER", "92:USER09_MOTHER",
+            "1111:TEST02_FATHER", "2222:TEST02_MOTHER",
+
+            "Momicon5541f:USER01_FATHER", "Momicon5541m:USER01_MOTHER",
+            "Momicon4452f:USER02_FATHER", "Momicon4452m:USER02_MOTHER",
+            "Momicon9487f:USER03_FATHER", "Momicon9487m:USER03_MOTHER",
+            "Momicon1445f:USER04_FATHER", "Momicon1445m:USER04_MOTHER",
+            "Momicon6453f:USER05_FATHER", "Momicon6453m:USER05_MOTHER",
+            "Momicon9845f:USER06_FATHER", "Momicon9845m:USER06_MOTHER",
+            "Momicon1145f:USER07_FATHER", "Momicon1145m:USER07_MOTHER",
+            "Momicon1322f:USER08_FATHER", "Momicon1322m:USER08_MOTHER",
+            "Momicon8854f:USER09_FATHER", "Momicon8854m:USER09_MOTHER",
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -205,6 +211,11 @@ public class LoginSettingActivity extends AppCompatActivity  {
                     // Account exists, return true if the password matches.
                     MyFileManager fileManager = new MyFileManager();
                     fileManager.initNewFile(pieces[1]); // Save file
+                    if(pieces[1].contains("FATHER")) {
+                        Log.e("Father", "Token register");
+                        MySocketManager socketM = new MySocketManager(pieces[1]);
+                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHER_FCM_TOKEN, "null", 0, FirebaseInstanceId.getInstance().getToken());
+                    }
                     return true;
                 }
             }
@@ -221,6 +232,7 @@ public class LoginSettingActivity extends AppCompatActivity  {
                 Intent intent=new Intent(LoginSettingActivity.this , MainActivity.class);
                 startActivity(intent);
                 finish();
+
             } else {
                 mEmailView.setError("등록되지 않은 정보입니다.");
                 mEmailView.requestFocus();

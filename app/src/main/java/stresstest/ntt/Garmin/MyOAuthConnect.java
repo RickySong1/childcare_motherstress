@@ -66,20 +66,29 @@ public class MyOAuthConnect {
             User_Token = "f6bdd9f2-faa1-421b-93f2-07d7a74707a3";
             User_Secret = "df8Jc9m1GCPqYQSee4uq2pkbYueICRZoXlR";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER04")==true){
-
+            User_Token = "090f1a3b-9637-473d-a590-79a26b51043d";
+            User_Secret = "Kgt3RZfC4i4QXUIW1LWML2LkjqPROxPzyA1";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER05")==true){
-
+            User_Token = "f6c39caf-b739-48b7-9426-a5b284f63625";
+            User_Secret = "OdkSF0kJ8UhLTiYBBy5YlFOCdRkxOg80XVB";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER06")==true){
-
+            User_Token = "b0000746-1d8f-4579-8f00-80357aeb25ed";
+            User_Secret = "2njWNyvQ9aTc2aomSjupV7G5Q3PTcTQgT2m";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER07")==true){
-
+            User_Token = "ac524007-1cf2-41aa-97c7-fd817c0bee8e";
+            User_Secret = "48S7cvY2RO3ikIIQ7C88E7XWUdPIBT1RpGl";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER08")==true){
-
+            User_Token = "cb6a85f0-22d5-4485-8ba2-ab60b1734304";
+            User_Secret = "NcyzjaqcfGsyHky1D18RKzbH5ZWlZSnMhjP";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER09")==true){
-
+            User_Token = "f7abb4f7-9c40-4e86-b90f-9b3963e20020";
+            User_Secret = "nIn7Fd4svydQwH77j5gq3H18G8OKItC7pau";
         }else if( MainActivity.USER_ID.split("_")[0].equals("TEST01")==true){
             User_Token = "500c5606-46cc-4ffb-a436-1ad508d42cf0";
             User_Secret = "Vi9YHR99yUVvxdqe03CDIayVo3S4axhDIJV";
+        }else if( MainActivity.USER_ID.split("_")[0].equals("TEST02")==true){
+            User_Token = "0d5c10c6-334b-417a-bc91-98a623e357e2";
+            User_Secret = "7hT7F0jNGmpdw2iKDY6nizqi0tyuNvRUPa5";
         }
 
         this_date = _this;
