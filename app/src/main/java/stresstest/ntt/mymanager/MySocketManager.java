@@ -58,7 +58,7 @@ public class MySocketManager {
 
     public enum SOCKET_MSG {
         GET_PAGE_COUNT ,  GET_FATHERCOMMENT , GET_MOTHERACTIVITY, GET_MOTHEREMOTION, GET_BABYACTIVITY_UP, GET_BABYACTIVITY_DOWN, GET_THRESHOLD,
-        SET_OPENAPP , SET_FATHERCOMMENT , SET_MOTHERACTIVITY, SET_MOTHEREMOTION, SET_BABYACTIVITY_UP, SET_BABYACTIVITY_DOWN, SET_STRESS_DATA, SET_FATHER_FCM_TOKEN
+        SET_OPENAPP , SET_FATHERCOMMENT , SET_MOTHERACTIVITY, SET_MOTHEREMOTION, SET_BABYACTIVITY_UP, SET_BABYACTIVITY_DOWN, SET_STRESS_DATA, SET_FATHER_FCM_TOKEN, SET_MOTHER_FCM_TOKEN
     }
 
     public MySocketManager(String _userType) {
@@ -103,6 +103,10 @@ public class MySocketManager {
 
                     case SET_FATHER_FCM_TOKEN:
                         send_message = pre_message+"SET_FATHER_FCM_TOKEN##"+"0"+"##"+"0"+"##"+save_string+"##";
+                        break;
+
+                    case SET_MOTHER_FCM_TOKEN:
+                        send_message = pre_message+"SET_MOTHER_FCM_TOKEN##"+"0"+"##"+"0"+"##"+save_string+"##";
                         break;
                 }
 

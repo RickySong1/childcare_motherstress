@@ -58,7 +58,6 @@ public class LoginSettingActivity extends AppCompatActivity  {
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "111:TEST01_FATHER", "222:TEST01_MOTHER",
             "1111:TEST02_FATHER", "2222:TEST02_MOTHER",
-
             "Momicon5541f:USER01_FATHER", "Momicon5541m:USER01_MOTHER",
             "Momicon4452f:USER02_FATHER", "Momicon4452m:USER02_MOTHER",
             "Momicon9487f:USER03_FATHER", "Momicon9487m:USER03_MOTHER",
@@ -211,11 +210,15 @@ public class LoginSettingActivity extends AppCompatActivity  {
                     // Account exists, return true if the password matches.
                     MyFileManager fileManager = new MyFileManager();
                     fileManager.initNewFile(pieces[1]); // Save file
-                    if(pieces[1].contains("FATHER")) {
-                        Log.e("Father", "Token register");
+
+                    if(pieces[1].contains("FATHER")){
                         MySocketManager socketM = new MySocketManager(pieces[1]);
                         socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHER_FCM_TOKEN, "null", 0, FirebaseInstanceId.getInstance().getToken());
+                    }else{
+                        MySocketManager socketM = new MySocketManager(pieces[1]);
+                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHER_FCM_TOKEN, "null", 0, FirebaseInstanceId.getInstance().getToken());
                     }
+
                     return true;
                 }
             }

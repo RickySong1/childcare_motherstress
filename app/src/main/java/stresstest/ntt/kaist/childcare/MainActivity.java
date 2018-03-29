@@ -601,13 +601,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     UpdateStressData mStressUpdate = new UpdateStressData(getContext(), graphView , stressgraph , loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000) , Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000)) ;
                     mStressUpdate.execute((Void) null);
 
-                    /*
                     Thread.sleep(1000 * 20 );  // wait 20 seconds to update stressGraph again
                     if(running){
                         mStressUpdate = new UpdateStressData(getContext(), graphView , stressgraph , loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000) , Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000)) ;
                         mStressUpdate.execute((Void) null);
                     }
-                    */
+
                 } catch (Exception e) {
                     Log.e("stressUpdateThread",e.toString());
                 }
@@ -905,7 +904,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     .setIcon(R.drawable.ic_emotion_lv1)
                                     .setTitle("Mother is stressful")
                                     //.setMessage("Mother looks very stressful. \n\nAsking why she does makes her be happy. \n\n Will you contact her soon?")
-                                    .setMessage("엄마의 기분이 좋지 않은 상태입니다. \n\n 엄마의 기분이 왜 안좋았는지 물어 보는 것이 스트레스 해소에 큰 도움이 됩니다. \n\n 엄마의 기분이 왜 안좋은지 물어 볼 것인가요?")
+                                    .setMessage("엄마의 기분이 좋지 않은 상태입니다. \n\n 엄마의 기분이 왜 안좋았는지에 대해서 이야기를 나누는 것만으로도 스트레스 해소에 큰 도움이 됩니다. \n\n 엄마의 기분이 왜 안좋은지 이야기를 나누어 주실수 있으신가요?")
                                     .setCancelable(false)
                                     .setPositiveButton("네", new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
@@ -1611,7 +1610,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         } else if (pieces[i].equals("SW")) { //
                             icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_warning, null);
                             sms_icon = true;
-                        } else if (pieces[1].equals("MC")){
+                        } else if (pieces[i].equals("MC")){
                             icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_sms, null);
                             sms_icon = true;
                         } if (pieces[i].equals("CO")) {
@@ -1636,14 +1635,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 ((LinearLayout) viewList.get(i)).setOnClickListener(null);
                             } else if (sms_icon) {
                                 if (USER_TYPE == USER_TYPE_ENUM.FATHER) {
+                                    AlphaAnimation blinkanimation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
+                                    blinkanimation.setDuration(800); // duration
+                                    blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
+                                    blinkanimation.setRepeatCount(-1); // Repeat animation infinitely
+                                    blinkanimation.setRepeatMode(Animation.REVERSE);
                                     icon = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_father_warning, null);
                                     addImage.setImageDrawable(icon);
+                                    addImage.startAnimation(blinkanimation);
                                     addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.FATHER_WAITING, i));
                                     ((LinearLayout) viewList.get(i)).addView(addImage);
                                     ((LinearLayout) viewList.get(i)).setOnClickListener(null);
                                 } else { // MOTHER
-
-                                    if(pieces[1].equals("MC")){
+                                    if(pieces[i].equals("MC")){
                                         AlphaAnimation blinkanimation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
                                         blinkanimation.setDuration(800); // duration
                                         blinkanimation.setInterpolator(new LinearInterpolator()); // do not alter animation rate
@@ -1655,7 +1659,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         addImage.setOnClickListener(new FatherAlertListener(((LinearLayout) viewList.get(i)), communicationType.MOTHER_CHECKED, i));
                                         ((LinearLayout) viewList.get(i)).addView(addImage);
                                         ((LinearLayout) viewList.get(i)).setOnClickListener(null);
-
                                     }else {
                                         AlphaAnimation blinkanimation = new AlphaAnimation(1, 0); // Change alpha from fully visible to invisible
                                         blinkanimation.setDuration(800); // duration
