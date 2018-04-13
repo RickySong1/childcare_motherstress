@@ -12,32 +12,18 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuth1AccessToken;
-import com.github.scribejava.core.model.OAuth1RequestToken;
 import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth10aService;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.ExecutionException;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import java.util.Locale;
 
 
 import stresstest.ntt.kaist.childcare.MainActivity;
-import stresstest.ntt.mymanager.MyFileManager;
 import stresstest.ntt.mymanager.MySocketManager;
 
 import static stresstest.ntt.kaist.childcare.MainActivity.USER_ID;
@@ -48,11 +34,21 @@ public class MyOAuthConnect {
     private String PROTECTED_RESOURCE_URL = "https://healthapi.garmin.com/wellness-api/rest/stressDetails?uploadStartTimeInSeconds=1521363600&uploadEndTimeInSeconds=1521435360";
     private String DAILIES_URL =              "https://healthapi.garmin.com/wellness-api/rest/dailies?uploadStartTimeInSeconds=1523718000&uploadEndTimeInSeconds=1523761200";
 
+    //Momicontest
+    //consumer
+    //587ae996-5042-4936-acc3-9c8600054f21
+    //consumer secret
+    //5wk39bzuWxUPwtrSTWntQWRFBYZo7doKp3p
+    // uat
+    //22ea058f-5252-428b-8d6c-f1de830f9ff0
+    // user secret
+    //1h1ac9mzeO8KmlmBwhr3qnioL3ICN4dO5go
+
     final String Consumer_Key ="fef35759-89eb-4915-acf4-4a991c0414d6";
     final String Consumer_Secret = "BzhUGDBRCmo8IpDMxzPB80AgSDteJFOnSkw";
 
-    String User_Token = "500c5606-46cc-4ffb-a436-1ad508d42cf0"; // Mine
-    String User_Secret = "Vi9YHR99yUVvxdqe03CDIayVo3S4axhDIJV"; // Mine
+    String User_Token = "862f45ab-c3d6-4be1-83bc-9064a14eeb76"; // Mine
+    String User_Secret = "dbZOJJC4PVRsDU2ALS8rFuc5TBOretBdYZi"; // Mine
 
     String this_date;
     public MyOAuthConnect(String _this ) throws Exception {
@@ -60,11 +56,11 @@ public class MyOAuthConnect {
             User_Token = "17d307ca-c3c3-406c-b29f-a03030ee9c01";
             User_Secret = "Rgpwi2WcEHgelQTSFEb7OPorkUBS0KpVSLx";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER02")==true){
-            User_Token = "f6c74606-9a4c-461e-804f-f2cc324ff4bc";
-            User_Secret = "FFMFW5C21xFqqpczeWfQfmrmfiKkHzImFh3";
+            User_Token = "e514b6ab-5c98-4393-af6e-071636491540";
+            User_Secret = "seGObe0dLD86D3JaPaoa1HQpbCfclMXrgyU";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER03")==true){
-            User_Token = "f6bdd9f2-faa1-421b-93f2-07d7a74707a3";
-            User_Secret = "df8Jc9m1GCPqYQSee4uq2pkbYueICRZoXlR";
+            User_Token = "262e4483-ee4f-4428-901b-a387f95d19cd";
+            User_Secret = "BABlHnqKiW9Y7mQou7gH8oIg5Fo3KmtBi5V";
         }else if( MainActivity.USER_ID.split("_")[0].equals("USER04")==true){
             User_Token = "090f1a3b-9637-473d-a590-79a26b51043d";
             User_Secret = "Kgt3RZfC4i4QXUIW1LWML2LkjqPROxPzyA1";
@@ -84,11 +80,11 @@ public class MyOAuthConnect {
             User_Token = "f7abb4f7-9c40-4e86-b90f-9b3963e20020";
             User_Secret = "nIn7Fd4svydQwH77j5gq3H18G8OKItC7pau";
         }else if( MainActivity.USER_ID.split("_")[0].equals("TEST01")==true){
-            User_Token = "500c5606-46cc-4ffb-a436-1ad508d42cf0";
-            User_Secret = "Vi9YHR99yUVvxdqe03CDIayVo3S4axhDIJV";
+            User_Token = "862f45ab-c3d6-4be1-83bc-9064a14eeb76";
+            User_Secret = "dbZOJJC4PVRsDU2ALS8rFuc5TBOretBdYZi";
         }else if( MainActivity.USER_ID.split("_")[0].equals("TEST02")==true){
-            User_Token = "0d5c10c6-334b-417a-bc91-98a623e357e2";
-            User_Secret = "7hT7F0jNGmpdw2iKDY6nizqi0tyuNvRUPa5";
+            User_Token = "9415eb28-e42c-4361-a91a-261bc9100dc2";
+            User_Secret = "CCJHrWbbLPA3eZRoUTTLBNHkSY9qrs5yGpn";
         }
 
         this_date = _this;
@@ -104,6 +100,43 @@ public class MyOAuthConnect {
             }
         }).start();
         */
+    }
+
+    public int[] stressGet(String this_time){
+
+        MySocketManager socketM = new MySocketManager(USER_ID);
+
+        SimpleDateFormat save_date = new SimpleDateFormat("yyyyMMdda", Locale.US);
+        String stress_data = socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_STRESS_DATA, this_time);
+
+        if(stress_data.contains("NO")){
+            int [] stress_value2 = new int[240];
+            return stress_value2;
+        }
+
+        Log.e("stress_data",this_time+" : " +stress_data);
+        stress_data = stress_data.substring(1,stress_data.length()-1);
+
+        int [] stress_value = new int[240];
+        for(int i=0 ; i <stress_data.split(",").length ; i++) {
+            String time = stress_data.split(",")[i].split("\"")[1];
+            String value = stress_data.split(",")[i].split(":")[1];
+
+            /*
+            if(save_date.format(NOW_TIME).contains("AM") && Integer.parseInt(time) >=0  && Integer.parseInt(time) <43200 ){
+                stress_value[ Integer.parseInt(time) / 180  ] = Integer.parseInt(value);
+            }else if(save_date.format(NOW_TIME).contains("PM") && Integer.parseInt(time) >=43200)  {
+                stress_value[ (Integer.parseInt(time) / 180)  - 240  ] = Integer.parseInt(value);
+            }
+            */
+            if(this_time.contains("AM") && Integer.parseInt(time) >=0  && Integer.parseInt(time) <43200 ){
+                stress_value[ Integer.parseInt(time) / 180  ] = Integer.parseInt(value);
+            }else if(this_time.contains("PM") && Integer.parseInt(time) >=43200)  {
+                stress_value[ (Integer.parseInt(time) / 180)  - 240  ] = Integer.parseInt(value);
+            }
+        }
+
+        return stress_value;
     }
 
     public int[] sendGet(String start , String end) throws Exception {

@@ -7,12 +7,15 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -49,11 +52,19 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.winsontan520.wversionmanager.library.WVersionManager;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -81,6 +92,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static Date NOW_TIME;
     public static boolean running = false;
     public static Resources res;
+
+    UpdateViewPager updateViewPager;
+
     public enum USER_TYPE_ENUM {
         MOTHER, FATHER
     }
@@ -96,6 +110,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     public static MySocketManager socketM;
+
+    String marketVersion, verSion;
+    AlertDialog.Builder mDialog;
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -125,8 +142,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart(){
         super.onStart();
-        Log.e("zz","start");
         running = true;
+
+        updateViewPager = new UpdateViewPager (mViewPager, mSectionsPagerAdapter);
+        updateViewPager.execute((Void) null);
     }
 
     @Override
@@ -139,46 +158,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        res = getResources();
-
-        //intent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
-        //MainActivity.this.startActivity(intent);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-        // Start Garmin application to initiate Sync.
-        Intent garminintent = this.getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
-        if ( USER_TYPE == USER_TYPE_ENUM.MOTHER ){
-            if(garminintent != null) {
-                MainActivity.this.startActivity(garminintent);
-            }else{
-                Toast.makeText(getApplicationContext(), "GARMIN Connector를 설치해주세요." ,  Toast.LENGTH_SHORT).show();
-            }
-        }
-
-        // Also start my application running on the background.
-        new Thread(new Runnable() { @Override public void run() {
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Log.e("new",e.toString());
-            }
-
-            ActivityManager am = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
-            List<ActivityManager.AppTask> appTask = am.getAppTasks();
-            for(ActivityManager.AppTask task : appTask ) {
-                ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
-                String packageName = taskInfo.baseIntent.getComponent().getPackageName();
-                if(packageName.equals(getPackageName()));
-                    am.moveTaskToFront(task.getTaskInfo().id, 0);
-            }
-        }
-        }).start();
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -188,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         MyFileManager mFile = new MyFileManager();
+        res = getResources();
 
         // If the user is already login
         String userID = mFile.getUserIdFromFile();
@@ -206,11 +189,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             finish();
         }
 
+
+        // Start Garmin application to initiate Sync.
+        Intent garminintent = getPackageManager().getLaunchIntentForPackage("com.garmin.android.apps.connectmobile");
+
+        if ( USER_TYPE == USER_TYPE_ENUM.MOTHER ){
+            if(garminintent != null) {
+                MainActivity.this.startActivity(garminintent);
+            }else{
+                Toast.makeText(getApplicationContext(), "GARMIN Connector를 설치해주세요." ,  Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        // Also start my application running on the background.
+        new Thread(new Runnable() { @Override public void run() {
+
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                Log.e("new",e.toString());
+            }
+
+            ActivityManager am = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+            List<ActivityManager.AppTask> appTask = am.getAppTasks();
+            for(ActivityManager.AppTask task : appTask ) {
+                ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
+                String packageName = taskInfo.baseIntent.getComponent().getPackageName();
+                if(packageName.equals(getPackageName()));
+                    am.moveTaskToFront(task.getTaskInfo().id, 0);
+            }
+        }
+        }).start();
+
+
         NOW_TIME = new Date();
         socketM = new MySocketManager(USER_ID);
-        SimpleDateFormat save_date = new SimpleDateFormat("yyyyMMdda");
-        socketM.setDataFromServer(SET_OPENAPP, save_date.format(NOW_TIME) , 0 , null);
+        SimpleDateFormat save_date = new SimpleDateFormat("yyyyMMdda",Locale.US);
 
+        PackageInfo pInfo = null;
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(),0);
+            int version = pInfo.versionCode;
+            socketM.setDataFromServer(SET_OPENAPP, save_date.format(NOW_TIME) , 0 ,Integer.toString(version));
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
@@ -218,8 +241,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mViewPager = (ViewPager) content_main.findViewById(R.id.content_viewpager);
 
-        UpdateViewPager updateViewPager = new UpdateViewPager (mViewPager, mSectionsPagerAdapter);
-        updateViewPager.execute((Void) null);
+ //       updateViewPager = new UpdateViewPager (mViewPager, mSectionsPagerAdapter);
+//        updateViewPager.execute((Void) null);
 
         //mViewPager.setAdapter(mSectionsPagerAdapter);
         //mViewPager.setCurrentItem(TOTAL_PAGE);
@@ -237,8 +260,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         @Override
         protected Boolean doInBackground(Void... params) {
+
             socketM = new MySocketManager(USER_ID);
-            SimpleDateFormat save_date = new SimpleDateFormat("yyyyMMdda");
+            SimpleDateFormat save_date = new SimpleDateFormat("yyyyMMdda",Locale.US);
             TOTAL_PAGE = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_PAGE_COUNT, save_date.format(NOW_TIME)));
             return true;
         }
@@ -367,20 +391,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
             final View rootView = inflater.inflate(R.layout.content_main, container, false);
             int page_num = getArguments().getInt(ARG_SECTION_NUMBER);
-
             values = new int[240];
 
-            /*
-            Random a = new Random();
-            for(int i=0 ; i<240 ;i++){
-                values[ i] = a.nextInt(100);
-            }
-            */
-
-            SimpleDateFormat date = new SimpleDateFormat("EEE, dd MMMM (a)");
-            SimpleDateFormat time = new SimpleDateFormat("HH");
-            SimpleDateFormat real_time = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-            save_date = new SimpleDateFormat("yyyyMMdda");
+            SimpleDateFormat date = new SimpleDateFormat("EEE, dd MMMM (a)",Locale.US);
+            SimpleDateFormat time = new SimpleDateFormat("HH",Locale.US);
+            SimpleDateFormat real_time = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss",Locale.US);
+            save_date = new SimpleDateFormat("yyyyMMdda",Locale.US);
 
             Date ttoday = new Date();
 
@@ -595,16 +611,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mBabyActTask = new UpdateInterface(babyViewList, MySocketManager.SOCKET_MSG.GET_BABYACTIVITY_DOWN, null , save_date.format(THIS_TIME));
             mBabyActTask.execute((Void) null);
 
-
             new Thread(new Runnable() { @Override public void run() {
                 try {
                     UpdateStressData mStressUpdate = new UpdateStressData(getContext(), graphView , stressgraph , loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000) , Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000)) ;
                     mStressUpdate.execute((Void) null);
 
-                    Thread.sleep(1000 * 20 );  // wait 20 seconds to update stressGraph again
-                    if(running){
-                        mStressUpdate = new UpdateStressData(getContext(), graphView , stressgraph , loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000) , Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000)) ;
-                        mStressUpdate.execute((Void) null);
+                    if(getArguments().getInt(ARG_SECTION_NUMBER) == TOTAL_PAGE) {
+                        Thread.sleep(1000 * 25);  // wait 20 seconds to update stressGraph again
+                        if (getArguments().getInt(ARG_SECTION_NUMBER) == TOTAL_PAGE && running) {
+                            mStressUpdate = new UpdateStressData(getContext(), graphView, stressgraph, loading, Long.toString(cal_for_stress_request_start.getTimeInMillis() / 1000), Long.toString(cal_for_stress_request_end.getTimeInMillis() / 1000));
+                            mStressUpdate.execute((Void) null);
+                        }
                     }
 
                 } catch (Exception e) {
@@ -612,7 +629,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
             }).start();
-
             //textView.setText( Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
             return rootView;
         }
@@ -686,7 +702,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             List <Boolean> motherEmotionBox = new ArrayList<>();
             int count = 0;
             boolean angry = false;
-            for(int i=0 ; i<values.length ; i++){
+            for(int i=0 ; i< values.length ; i++){
                 count ++;
                 if(values[i] >= GraphView.HIGH_STRESS_SCORE){
                     angry = true;
@@ -1227,7 +1243,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     if( getDrawableString( getResources()  ,newView.getDrawable()).compareTo("E1") == 0 || getDrawableString( getResources()  ,newView.getDrawable()).compareTo("E2") == 0 ){
                                         socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHERCOMMENT , save_date.format(THIS_TIME) , v.getLabelFor() , "WN") ;  // Mother emoticon index is different
                                     }
-
                                     socketM = new MySocketManager(USER_ID);
                                     socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHEREMOTION, save_date.format(THIS_TIME) , v.getLabelFor() , save_icon_string) ;  // Mother emoticon index is different
                                     break;
@@ -1372,10 +1387,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             protected Boolean doInBackground(Void... voids) {
                 try {
                     MyOAuthConnect a = new MyOAuthConnect(save_date.format(THIS_TIME));
-                    values = a.sendGet(start , end);
 
-                    //MySocketManager socketM = new MySocketManager(USER_ID);
-                    //thres = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_THRESHOLD , save_date.format(THIS_TIME)));
+                    //values = a.sendGet(start , end);
+                    values = a.stressGet(save_date.format(THIS_TIME));
+
+                    MySocketManager socketM = new MySocketManager(USER_ID);
+                    thres = Integer.parseInt(socketM.getDataFromServer(MySocketManager.SOCKET_MSG.GET_THRESHOLD , save_date.format(THIS_TIME)));
 
                 } catch (Exception e) {
                     Log.e("doInBackground",e.toString());
@@ -1387,7 +1404,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             protected void onPostExecute(Boolean success) {
                 // LOAD MOTHER STRESS VALUE
                 if(running) {
-
                     if(context != null && context.getResources()!=null) {
                         graphView.removeView(stressgraph);
                         stressgraph = new GraphView(context, values, "", null, verlabels, thres);

@@ -67,6 +67,15 @@ public class LoginSettingActivity extends AppCompatActivity  {
             "Momicon1145f:USER07_FATHER", "Momicon1145m:USER07_MOTHER",
             "Momicon1322f:USER08_FATHER", "Momicon1322m:USER08_MOTHER",
             "Momicon8854f:USER09_FATHER", "Momicon8854m:USER09_MOTHER",
+            "f1:USER01_FATHER", "m1:USER01_MOTHER",
+            "f2:USER02_FATHER", "m2:USER02_MOTHER",
+            "f3:USER03_FATHER", "m3:USER03_MOTHER",
+            "f4:USER04_FATHER", "m4:USER04_MOTHER",
+            "f5:USER05_FATHER", "m5:USER05_MOTHER",
+            "f6:USER06_FATHER", "m6:USER06_MOTHER",
+            "f7:USER07_FATHER", "m7:USER07_MOTHER",
+            "f8:USER08_FATHER", "m8:USER08_MOTHER",
+            "f9:USER09_FATHER", "m9:USER09_MOTHER",
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -199,7 +208,7 @@ public class LoginSettingActivity extends AppCompatActivity  {
 
             try {
                 // Simulate network access.
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 return false;
             }
@@ -211,14 +220,15 @@ public class LoginSettingActivity extends AppCompatActivity  {
                     MyFileManager fileManager = new MyFileManager();
                     fileManager.initNewFile(pieces[1]); // Save file
 
-                    if(pieces[1].contains("FATHER")){
-                        MySocketManager socketM = new MySocketManager(pieces[1]);
-                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHER_FCM_TOKEN, "null", 0, FirebaseInstanceId.getInstance().getToken());
-                    }else{
-                        MySocketManager socketM = new MySocketManager(pieces[1]);
-                        socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHER_FCM_TOKEN, "null", 0, FirebaseInstanceId.getInstance().getToken());
+                    if(pieces[0].length()>3) {
+                        if (pieces[1].contains("FATHER")) {
+                            MySocketManager socketM = new MySocketManager(pieces[1]);
+                            socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_FATHER_FCM_TOKEN, "null", 0, FirebaseInstanceId.getInstance().getToken());
+                        } else {
+                            MySocketManager socketM = new MySocketManager(pieces[1]);
+                            socketM.setDataFromServer(MySocketManager.SOCKET_MSG.SET_MOTHER_FCM_TOKEN, "null", 0, FirebaseInstanceId.getInstance().getToken());
+                        }
                     }
-
                     return true;
                 }
             }

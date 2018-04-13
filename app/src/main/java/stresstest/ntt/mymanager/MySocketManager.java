@@ -1,5 +1,6 @@
 package stresstest.ntt.mymanager;
 
+import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.util.Log;
 
@@ -22,7 +23,8 @@ import java.util.List;
 public class MySocketManager {
 
     public static final int PORT = 22222;
-    public static final String IP_ADDRESS = "143.248.134.121";
+    //public static final String IP_ADDRESS = "143.248.47.103";
+    public static final String IP_ADDRESS = "220.67.71.240";
     public static final String SET_DATA = "SET_DATA";
     public static final String SET_REQUEST = "SET_REQUEST";
 
@@ -58,7 +60,7 @@ public class MySocketManager {
 
     public enum SOCKET_MSG {
         GET_PAGE_COUNT ,  GET_FATHERCOMMENT , GET_MOTHERACTIVITY, GET_MOTHEREMOTION, GET_BABYACTIVITY_UP, GET_BABYACTIVITY_DOWN, GET_THRESHOLD,
-        SET_OPENAPP , SET_FATHERCOMMENT , SET_MOTHERACTIVITY, SET_MOTHEREMOTION, SET_BABYACTIVITY_UP, SET_BABYACTIVITY_DOWN, SET_STRESS_DATA, SET_FATHER_FCM_TOKEN, SET_MOTHER_FCM_TOKEN
+        SET_OPENAPP , SET_FATHERCOMMENT , SET_MOTHERACTIVITY, SET_MOTHEREMOTION, SET_BABYACTIVITY_UP, SET_BABYACTIVITY_DOWN, SET_STRESS_DATA, SET_FATHER_FCM_TOKEN, SET_MOTHER_FCM_TOKEN, GET_STRESS_DATA
     }
 
     public MySocketManager(String _userType) {
@@ -80,7 +82,7 @@ public class MySocketManager {
 
                 switch(msg){
                     case SET_OPENAPP:
-                        send_message = pre_message+"LOGIN##"+_target_time+"##";
+                        send_message = pre_message+"LOGIN##"+_target_time+"##"+save_string;
                         break;
                     case SET_MOTHEREMOTION:
                         send_message = pre_message+"SET_MOTHEREMOTION##"+_target_time+"##"+Integer.toString(viewid)+"##"+save_string+"##";
@@ -100,7 +102,6 @@ public class MySocketManager {
                     case SET_STRESS_DATA:
                         send_message = pre_message+"SET_STRESS_DATA##"+_target_time+"##"+"0"+"##"+save_string+"##";
                         break;
-
                     case SET_FATHER_FCM_TOKEN:
                         send_message = pre_message+"SET_FATHER_FCM_TOKEN##"+"0"+"##"+"0"+"##"+save_string+"##";
                         break;
@@ -158,6 +159,10 @@ public class MySocketManager {
                         break;
                     case GET_BABYACTIVITY_DOWN:
                         send_message = pre_message+"GET_BABYACTIVITY_DOWN##"+date+"##";
+                        break;
+
+                    case GET_STRESS_DATA:
+                        send_message = pre_message+"GET_STRESS_DATA##"+date+"##";
                         break;
                 }
 
