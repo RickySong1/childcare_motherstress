@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "32491400432",
+    "firebase_url": "https://childcaremotherstress.firebaseio.com",
+    "project_id": "childcaremotherstress",
+    "storage_bucket": "childcaremotherstress.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32491400432:android:d1628aa912cf3e9b",
+        "android_client_info": {
+          "package_name": "stresstest.ntt.kaist.childcare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32491400432-dgpjkk5fckb26uofnn0t9j5fg4t3ls67.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "stresstest.ntt.kaist.childcare",
+            "certificate_hash": "1be14680135c46f8bcfa9bdfc7702fb8c801b3af"
+          }
+        },
+        {
+          "client_id": "32491400432-ppof3ri1insca0kbn7ajuplv5ie80ke0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6LG1kRz7STAfckDQ4t82jyIwOQAueW9o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32491400432-ppof3ri1insca0kbn7ajuplv5ie80ke0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
